@@ -1,18 +1,32 @@
 <template>
+<section class="hero is-light is-fullheight-with-navbar">
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+      <p class="is-size-2">Datenbankobjekt: {{data.phrase1}}</p>
+      <p class="is-size-1">{{msg}}</p>
   </div>
+</section>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
+import firebase from 'firebase';
+import { ref } from 'vue';
 export default {
-  name: 'Home',
-  components: {
-    HelloWorld
-  }
+  setup() {
+    const msg = 'Hallo Welt';
+    const data = ref('')
+    // const userData = reactive({
+    // });
+    const db = firebase.firestore();
+    db.collection('tests').doc('phrases').onSnapshot((doc) => {
+      data.value = doc.data();
+    });
+    console.log(data);
+    // console.log()
+    // db.collection('users').doc('')
+    return {
+      data,
+      msg
+    }
+  },
 }
 </script>

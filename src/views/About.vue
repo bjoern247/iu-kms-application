@@ -1,5 +1,5 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <p class="is-size-4">Diese Seite ist nur aufrufbar, wenn eingeloggt.</p>
   </div>
 </template>
