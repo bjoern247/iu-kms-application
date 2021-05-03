@@ -22,16 +22,17 @@
       </router-link>
     </div>
     <div class="container">
-      <div id="nav" class="navbar-menu">
+      <div id="nav" class="navbar-menu" v-if="user != null">
         <div class="navbar-start">
-          <router-link class="navbar-item" to="/">Home</router-link>
-          <router-link class="navbar-item" to="/about">About</router-link>
+          <router-link class="navbar-item" to="/">Übersicht</router-link>
+          <router-link class="navbar-item" to="/tickets">Deine Tickets</router-link>
         </div>
 
         <div class="navbar-end">
+          <router-link class="navbar-item" to="/settings">Einstellungen</router-link>
           <div class="navbar-item">
             <div class="buttons" style="margin-right: 1rem;">
-              <a class="button is-danger" v-if="user != null" @click="logout()"
+              <a class="button is-danger" @click="logout()"
                 >Logout</a
               >
             </div>
@@ -40,8 +41,11 @@
       </div>
     </div>
   </nav>
-
-  <router-view class="padding" />
+  <section class="hero is-light is-fullheight-with-navbar">
+    <div class="app-content">
+      <router-view/>
+    </div>
+  </section>
 </template>
 
 <script>
@@ -85,7 +89,10 @@ export default {
 .navbar {
   box-shadow: 0 4px 5px 0px rgba(0, 0, 0, 0.1);
 }
-.padding {
-  padding-top: 3.5rem;
+.navbar-item {
+  font-weight: 700;
+}
+.app-content {
+  padding: 4rem;
 }
 </style>

@@ -1,59 +1,53 @@
 <template>
-  <section class="hero is-light is-fullheight-with-navbar">
-    <div class="container">
-      <div class="login">
-        <h1 class="is-size-1">Bitte anmelden</h1>
-        <form @submit.prevent="Login">
-          <div class="field">
-            <p class="control has-icons-left">
-              <input
-                class="input"
-                type="email"
-                placeholder="Email"
-                v-model="email"
-              />
-              <span class="icon is-small is-left">
-                <i class="fas fa-envelope"></i>
-              </span>
-            </p>
-          </div>
-          <div class="field">
-            <p class="control has-icons-left">
-              <input
-                class="input"
-                type="password"
-                placeholder="Password"
-                v-model="password"
-              />
-              <span class="icon is-small is-left">
-                <i class="fas fa-lock"></i>
-              </span>
-            </p>
-          </div>
-          <div class="columns">
-            <div class="column">
-              <div class="field is-grouped is-left">
-                <p class="control">
-                  <button class="button is-primary" @click="login()">
-                    Login
-                  </button>
-                </p>
-              </div>
-            </div>
-            <div class="column">
-              <div class="field is-grouped is-right">
-                <p class="control">
-                  <button class="button" @click="resetPassword()">
-                    Passwort vergessen
-                  </button>
-                </p>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
+  <div class="container">
+    <div class="login">
+      <h1 class="is-size-1">Bitte anmelden</h1>
+      <form @submit.prevent="Login">
+        <div class="field">
+          <p class="control has-icons-left">
+            <input
+              class="input"
+              type="email"
+              placeholder="Email"
+              v-model="email"
+            />
+            <span class="icon is-small is-left">
+              <i class="fas fa-envelope"></i>
+            </span>
+          </p>
+        </div>
+        <div class="field">
+          <p class="control has-icons-left">
+            <input
+              class="input"
+              type="password"
+              placeholder="Password"
+              v-model="password"
+            />
+            <span class="icon is-small is-left">
+              <i class="fas fa-lock"></i>
+            </span>
+          </p>
+        </div>
+        <div class="buttons">
+          <p class="control" style="width: 50%">
+            <button style="width: 100%"
+              class="button is-primary"
+              :class="{ 'is-loading': loading }"
+              @click="login()"
+            >
+              Login
+            </button>
+          </p>
+          <p class="control is-right" style="width: 48%; margin-left: 2%;">
+            <button class="button" @click="resetPassword()" style="width: 100%;">
+              Passwort vergessen
+            </button>
+          </p>
+        </div>
+      </form>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -66,16 +60,22 @@ export default {
     const email = ref("");
     const password = ref("");
     const router = useRouter();
+    const loading = ref(false);
 
     function login() {
+      loading.value = true;
       firebase
         .auth()
         .signInWithEmailAndPassword(email.value, password.value)
         .then(() => {
           (data) => console.log(data);
           router.push("/");
+          loading.value = false;
         })
-        .catch((err) => alert(err.message));
+        .catch((err) => {
+          alert(err.message);
+          loading.value = false;
+        });
     }
 
     function resetPassword() {
@@ -87,7 +87,15 @@ export default {
       password,
       login,
       resetPassword,
+      loading,
     };
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.login {
+  margin-left: 15vw;
+  margin-right: 15vw;
+}
+</style>
