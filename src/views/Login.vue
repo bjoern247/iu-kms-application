@@ -20,7 +20,7 @@
           <p class="control has-icons-left">
             <input
               class="input"
-              type="password"
+              :type="passwordFieldType"
               placeholder="Password"
               v-model="password"
             />
@@ -33,18 +33,9 @@
           <div class="level-left">
             <div class="level-item">
               <label class="checkbox">
-                <input type="checkbox" />
+                <input type="checkbox" @click="switchVisibility()"/>
                 Passwort anzeigen
               </label>
-            </div>
-          </div>
-          <div class="level-right">
-            <div class="level-item">
-              <p class="control">
-                <a class="link" @click="resetPassword()">
-                  Passwort vergessen?
-                </a>
-              </p>
             </div>
           </div>
         </nav>
@@ -72,6 +63,7 @@ import { useRouter } from "vue-router";
 export default {
   setup() {
     const email = ref("");
+    const passwordFieldType = ref("password");
     const password = ref("");
     const router = useRouter();
     const loading = ref(false);
@@ -82,7 +74,7 @@ export default {
         .auth()
         .signInWithEmailAndPassword(email.value, password.value)
         .then(() => {
-          (data) => console.log(data);
+          // (data) => console.log(data);
           router.push("/");
           loading.value = false;
         })
@@ -91,17 +83,17 @@ export default {
           loading.value = false;
         });
     }
-
-    function resetPassword() {
-      // To-DO
+    function switchVisibility() {
+      passwordFieldType.value = this.passwordFieldType === "password" ? "text" : "password";
     }
 
     return {
       email,
+      passwordFieldType,
       password,
       login,
-      resetPassword,
       loading,
+      switchVisibility
     };
   },
 };

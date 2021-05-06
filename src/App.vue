@@ -8,7 +8,7 @@
         </div>
       </div>
     </div>
-    <router-view class="mb-3"/>
+    <router-view class="mb-3" />
     <div class="columns is-centered is-vcentered">
       <div class="column is-12-desktop is-two-thirds-widescreen is-half-fullhd">
         <div class="box">
@@ -31,10 +31,22 @@
               </svg>
             </p>
             <p class="level-item has-text-centered">
-              <a class="link is-info" href="https://www.iu.de/impressum/">Impressum</a>
+              <a class="link is-info" href="https://www.iu.de/impressum/"
+                >Impressum</a
+              >
             </p>
             <p class="level-item has-text-centered">
-              <a class="link is-info" href="https://www.iu.de/datenschutz/">Datenschutzerklärung</a>
+              <a class="link is-info" href="https://www.iu.de/datenschutz/"
+                >Datenschutzerklärung</a
+              >
+            </p>
+            <p v-if="$route.name !== 'Home' && $route.name !== 'Login'" class="level-item has-text-centered">
+              <router-link to="/" class="button is-primary is-fullwidth"
+                ><span class="icon is-small">
+                  <i class="fas fa-arrow-left"></i>
+                </span>
+                <span>Zurück</span></router-link
+              >
             </p>
           </nav>
         </div>
@@ -46,8 +58,7 @@
 <script>
 export default {
   setup() {
-    return {
-    };
+    return {};
   },
 };
 </script>

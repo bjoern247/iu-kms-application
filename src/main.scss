@@ -2,9 +2,13 @@
 $navbar-item-hover-background-color: hsl(0, 0%, 0%, 0%);
 $navbar-item-hover-color: #000;
 // Bulma Import
+.tag {
+  vertical-align: top!important;
+}
 @import '~bulma';
 .link {
   text-decoration: underline;
+  color: $text;
 }
 html, body {
   background-color: whitesmoke;

@@ -5,20 +5,40 @@
     >
       <div class="box">
         <p class="title">Tickets</p>
-        <p class="subtitle">Aktive Tickets: 0</p>
-        <div class="buttons is-grouped is-centered">
-          <router-link to="/create-ticket" class="button is-primary">
-            <span class="icon is-small">
-              <i class="fas fa-plus"></i>
-            </span>
-            <span>Erstellen</span>
-          </router-link>
-          <router-link to="/tickets" class="button is-primary">
-            <span class="icon is-small">
-              <i class="far fa-edit"></i>
-            </span>
-            <span>Verwalten</span>
-          </router-link>
+        <p class="subtitle">
+          Erstellt <span class="tag is-rounded is-dark">0</span> Rückfrage
+          <span class="tag is-rounded is-danger">0</span> Erledigt
+          <span class="tag is-rounded is-success">0</span>
+        </p>
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <router-link
+                  to="/create-ticket"
+                  class="button is-primary is-fullwidth"
+                >
+                  <span class="icon is-small">
+                    <i class="fa fa-plus"></i>
+                  </span>
+                  <span>Erstellen</span>
+                </router-link>
+              </p>
+            </div>
+            <div class="field">
+              <p class="control">
+                <router-link
+                  to="/ticket-overview"
+                  class="button is-primary is-fullwidth"
+                >
+                  <span class="icon is-small">
+                    <i class="far fa-edit"></i>
+                  </span>
+                  <span>Verwalten</span>
+                </router-link>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -26,16 +46,34 @@
       class="column is-half-desktop is-one-third-widescreen is-one-quarter-fullhd"
     >
       <div class="box">
-        <p class="title">Nutzer <span class="tag is-primary">Student</span></p>
-        <p class="subtitle">{{ userData.email }} </p>
-        <div class="buttons is-grouped is-centered">
-          <!-- <router-link class="button is-primary" to="/settings">
-            <span class="icon is-small">
-              <i class="fas fa-arrow-right"></i>
-            </span>
-            <span>Passwort ändern</span>
-          </router-link> -->
-          <a class="button is-danger" @click="logout()">Logout</a>
+        <p class="title">Konto</p>
+        <p class="subtitle">
+          {{ userData.displayName }}
+          <span class="tag is-info">Student</span>
+        </p>
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <router-link
+                  class="button is-primary is-fullwidth"
+                  to="/course-overview"
+                >
+                  <span class="icon is-small">
+                    <i class="fas fa-arrow-right"></i>
+                  </span>
+                  <span>Kursübersicht</span>
+                </router-link>
+              </p>
+            </div>
+            <div class="field">
+              <p class="control">
+                <a class="button is-danger is-fullwidth" @click="logout()"
+                  >Logout</a
+                >
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -52,7 +90,7 @@ export default {
     const userData = state.userData.value;
     return {
       userData,
-      logout
+      logout,
     };
   },
 };

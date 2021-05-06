@@ -21,7 +21,6 @@ const state = reactive({
   userData: reactive({
     displayName: null,
     email: true,
-    matrikelNumber: null,
     role: null,
     uid: null
   })
@@ -56,7 +55,6 @@ export default function () {
                 console.log(_data);
                 state.userData.displayName = _data.displayName;
                 state.userData.email = _data.email;
-                state.userData.matrikelNumber = _data.matrikelNumber;
                 state.userData.role = _data.role;
                 state.userData.uid = _data.uid;
               });

@@ -15,12 +15,34 @@ const routes = [
     }
   },
   {
-    path: '/tickets',
-    name: 'Tickets',
+    path: '/ticket-overview',
+    name: 'TicketOverview',
     // route level code-splitting
     // this generates a separate chunk (tickets.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "tickets" */ '../views/MyTickets.vue'),
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/TicketOverview.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/course-overview',
+    name: 'CourseOverview',
+    // route level code-splitting
+    // this generates a separate chunk (tickets.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/CourseOverview.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/create-ticket',
+    name: 'TicketCreation',
+    // route level code-splitting
+    // this generates a separate chunk (tickets.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/TicketCreation.vue'),
     meta: {
       requiresAuth: true
     }
