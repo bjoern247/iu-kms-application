@@ -1,5 +1,5 @@
 <script>
 export default {
-  name: 'EmployeeView'
+  name: 'EditorView'
 }
 </script>

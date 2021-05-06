@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
-import firebase from 'firebase'
+import useFirebaseAuth from '../store/user';
+
+const state = useFirebaseAuth();
 
 const routes = [
   {
@@ -46,19 +48,14 @@ const router = createRouter({
   routes
 })
 
-firebase.getCurrentUser = () => {
-  return new Promise((resolve, reject) => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(user => {
-      unsubscribe();
-      resolve(user);
-    }, reject);
-  }
-)};
-
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  if (requiresAuth && !await firebase.getCurrentUser()) {
-    next('Login');
+  if (requiresAuth) {
+    if (state.user.value !== null) {
+      next();
+    } else {
+      next('Login');
+    }
   } else {
     next();
   }
