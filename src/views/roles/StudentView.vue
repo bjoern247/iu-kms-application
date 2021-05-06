@@ -55,19 +55,6 @@
           <div class="field-body">
             <div class="field">
               <p class="control">
-                <router-link
-                  class="button is-primary is-fullwidth"
-                  to="/course-overview"
-                >
-                  <span class="icon is-small">
-                    <i class="fas fa-arrow-right"></i>
-                  </span>
-                  <span>Kursübersicht</span>
-                </router-link>
-              </p>
-            </div>
-            <div class="field">
-              <p class="control">
                 <a class="button is-danger is-fullwidth" @click="logout()"
                   >Logout</a
                 >
