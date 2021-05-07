@@ -26,6 +26,28 @@ const routes = [
     }
   },
   {
+    path: '/create-course',
+    name: 'CourseCreation',
+    // route level code-splitting
+    // this generates a separate chunk (tickets.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/CourseCreation.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/user-overview',
+    name: 'UserOverview',
+    // route level code-splitting
+    // this generates a separate chunk (tickets.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/UserOverview.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/course-overview',
     name: 'CourseOverview',
     // route level code-splitting

@@ -14,7 +14,7 @@
               <p class="control">
                 <router-link
                   class="button is-primary is-fullwidth"
-                  to="/course-overview"
+                  to="/create-course"
                 >
                   <span class="icon is-small">
                     <i class="fas fa-plus"></i>
@@ -104,7 +104,7 @@
             <div class="field">
               <p class="control">
                 <router-link
-                  to="/ticket-overview"
+                  to="/user-overview"
                   class="button is-primary is-fullwidth"
                 >
                   <span class="icon is-small">
