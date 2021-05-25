@@ -35,7 +35,10 @@ export default function () {
       .auth()
       .signOut()
       .then(() => {
+        // clear data store
         state.user = null;
+        state.initialized = false;
+        state.error = null;
         router.push("/login");
       })
       .catch((error) => {
@@ -62,7 +65,6 @@ export default function () {
             state.user = null;
           }
           state.initialized = true;
-          console.log(_user);
           resolve(true);
         });
     });
