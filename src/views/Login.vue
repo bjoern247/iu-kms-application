@@ -2,7 +2,7 @@
   <div class="columns is-centered is-vcentered">
     <div class="column is-12-desktop is-two-thirds-widescreen is-half-fullhd">
       <form class="box" @submit.prevent="Login">
-        <p class="is-size-5 mb-4">Anmeldung</p>
+        <p class="is-size-3 mb-4 has-text-centered">Anmeldung</p>
         <div class="field">
           <p class="control has-icons-left">
             <input

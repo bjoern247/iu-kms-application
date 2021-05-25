@@ -3,8 +3,8 @@
     <div class="columns is-centered is-vcentered">
       <div class="column is-12-desktop is-two-thirds-widescreen is-half-fullhd">
         <div class="box">
-          <p class="is-size-2 is-hidden-touch">IU Korrekturmanagementsystem</p>
-          <p class="is-size-2 is-hidden-desktop">IU KMS</p>
+          <p class="is-size-2 is-hidden-touch has-text-centered">IU Korrekturmanagementsystem</p>
+          <p class="is-size-2 is-hidden-desktop has-text-centered">IU KMS</p>
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@
               >
             </p>
             <p v-if="$route.name !== 'Home' && $route.name !== 'Login'" class="level-item has-text-centered">
-              <router-link to="/" class="button is-primary is-fullwidth"
+              <router-link to="/" class="button is-dark is-fullwidth"
                 ><span class="icon is-small">
                   <i class="fas fa-arrow-left"></i>
                 </span>
@@ -68,7 +68,6 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 .navbar {
