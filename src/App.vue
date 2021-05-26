@@ -3,17 +3,75 @@
     <div class="columns is-centered is-vcentered">
       <div class="column is-12-desktop is-two-thirds-widescreen is-half-fullhd">
         <div class="box">
-          <p class="is-size-2 is-hidden-touch has-text-centered">IU Korrekturmanagementsystem</p>
-          <p class="is-size-2 is-hidden-desktop has-text-centered">IU KMS</p>
+          <nav class="level has-text-left">
+            <div class="level-item has-text-centered">
+              <router-link
+                to="/"
+                class="button is-dark"
+                v-if="$route.name !== 'Home' && $route.name !== 'Login'"
+              >
+                <span class="icon">
+                  <i class="fas fa-home"></i>
+                </span>
+              </router-link>
+              <button
+                class="button is-dark ml-2 is-hidden-tablet"
+                v-if="$route.name !== 'Home' && $route.name !== 'Login'"
+                @click="goBack()"
+              >
+                <span class="icon">
+                  <i class="fas fa-arrow-left"></i>
+                </span>
+              </button>
+            </div>
+            <div class="level-item has-text-centered">
+              <p class="is-size-2 is-hidden-mobile">
+                IU Korrekturmanagementsystem
+              </p>
+              <p
+                v-if="$route.name === 'Home' || $route.name === 'Login'"
+                class="is-size-2 is-hidden-desktop"
+              >
+                IU KMS
+              </p>
+            </div>
+            <div class="level-item has-text-centered is-hidden-mobile">
+              <button
+                class="button is-dark"
+                v-if="$route.name !== 'Home' && $route.name !== 'Login'"
+                @click="goBack()"
+              >
+                <span class="icon">
+                  <i class="fas fa-arrow-left"></i>
+                </span>
+              </button>
+            </div>
+          </nav>
+
+          <!-- <p class="is-size-2 is-hidden-touch has-text-centered">
+            IU Korrekturmanagementsystem
+          </p>
+          <p class="is-size-2 is-hidden-desktop has-text-centered">IU KMS</p> -->
         </div>
       </div>
     </div>
-    <router-view class="mb-3" />
+    <span v-if="$route.name !== 'Home'">
+      <div class="columns is-centered is-vcentered">
+        <div
+          class="column is-12-desktop is-two-thirds-widescreen is-half-fullhd"
+        >
+          <router-view class="mb-3" />
+        </div>
+      </div>
+    </span>
+    <span v-else>
+      <router-view class="mb-3" />
+    </span>
     <div class="columns is-centered is-vcentered">
       <div class="column is-12-desktop is-two-thirds-widescreen is-half-fullhd">
         <div class="box">
           <nav class="level">
-            <p class="level-item has-text-centered">
+            <p class="level-item has-text-centered is-hidden-mobile">
               <svg
                 data-t-c="Main Menu"
                 data-t-a="click"
@@ -40,14 +98,17 @@
                 >Datenschutzerklärung</a
               >
             </p>
-            <p v-if="$route.name !== 'Home' && $route.name !== 'Login'" class="level-item has-text-centered">
-              <router-link to="/" class="button is-dark is-fullwidth"
-                ><span class="icon is-small">
-                  <i class="fas fa-arrow-left"></i>
-                </span>
-                <span>Zurück</span></router-link
+            <div class="level-item has-text-centered">
+              <button
+                class="button is-danger"
+                v-if="$route.name !== 'Home' && $route.name !== 'Login'"
+                @click="logout()"
               >
-            </p>
+                <span class="icon">
+                  <i class="fas fa-sign-out-alt"></i>
+                </span>
+              </button>
+            </div>
           </nav>
         </div>
       </div>
@@ -56,9 +117,19 @@
 </template>
 
 <script>
+import useFirebaseAuth from "./store/user";
+import { useRouter } from "vue-router";
 export default {
   setup() {
-    return {};
+    const { logout } = useFirebaseAuth();
+    const router = useRouter();
+    function goBack() {
+      router.back();
+    }
+    return {
+      logout,
+      goBack,
+    };
   },
 };
 </script>
