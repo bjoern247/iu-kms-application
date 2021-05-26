@@ -5,53 +5,12 @@
         <div class="box">
           <nav class="level has-text-centered">
             <div class="level-item has-text-centered mb-0">
-              <router-link
-                to="/"
-                class="button is-dark"
-                v-if="$route.name !== 'Home' && $route.name !== 'Login'"
-              >
-                <span class="icon">
-                  <i class="fas fa-home"></i>
-                </span>
-              </router-link>
-              <button
-                class="button is-dark ml-2 is-hidden-tablet"
-                v-if="$route.name !== 'Home' && $route.name !== 'Login'"
-                @click="goBack()"
-              >
-                <span class="icon">
-                  <i class="fas fa-arrow-left"></i>
-                </span>
-              </button>
-            </div>
-            <div class="level-item has-text-centered mb-0">
               <p class="is-size-2 is-hidden-touch">
                 IU Korrekturmanagementsystem
               </p>
-              <p
-                v-if="$route.name === 'Home' || $route.name === 'Login'"
-                class="is-size-2 is-hidden-desktop"
-              >
-                IU KMS
-              </p>
-            </div>
-            <div class="level-item has-text-centered is-hidden-mobile mb-0">
-              <button
-                class="button is-dark"
-                v-if="$route.name !== 'Home' && $route.name !== 'Login'"
-                @click="goBack()"
-              >
-                <span class="icon">
-                  <i class="fas fa-arrow-left"></i>
-                </span>
-              </button>
+              <p class="is-size-2 is-hidden-desktop">IU KMS</p>
             </div>
           </nav>
-
-          <!-- <p class="is-size-2 is-hidden-touch has-text-centered">
-            IU Korrekturmanagementsystem
-          </p>
-          <p class="is-size-2 is-hidden-desktop has-text-centered">IU KMS</p> -->
         </div>
       </div>
     </div>
@@ -99,15 +58,36 @@
               >
             </p>
             <div class="level-item">
-              <button
-                class="button is-danger is-pulled-right"
-                v-if="$route.name !== 'Home' && $route.name !== 'Login'"
-                @click="logout()"
-              >
-                <span class="icon">
-                  <i class="fas fa-sign-out-alt"></i>
-                </span>
-              </button>
+              <div class="buttons">
+                <router-link
+                  to="/"
+                  class="button is-dark"
+                  v-if="$route.name !== 'Home' && $route.name !== 'Login'"
+                >
+                  <span class="icon">
+                    <i class="fas fa-home"></i>
+                  </span>
+                </router-link>
+
+                <button
+                  class="button is-dark"
+                  v-if="$route.name !== 'Home' && $route.name !== 'Login'"
+                  @click="goBack()"
+                >
+                  <span class="icon">
+                    <i class="fas fa-arrow-left"></i>
+                  </span>
+                </button>
+                <button
+                  class="button is-danger is-pulled-right"
+                  v-if="$route.name !== 'Home' && $route.name !== 'Login'"
+                  @click="logout()"
+                >
+                  <span class="icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                  </span>
+                </button>
+              </div>
             </div>
           </nav>
         </div>

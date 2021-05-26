@@ -9,26 +9,79 @@
         </span>
       </p>
     </div>
-    <div class="box p-0 pb-">
-      <!-- <div v-for="course in courses" :key="course.id" class="row">
-        <div class="columns is-mobile is-centered mt-2 pr-4 pl-4">
-          <div
-            class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-one-quarter-mobile"
+    <div class="box p-0">
+      <div
+        class="columns is-mobile is-centered mt-2 mb-0 mr-0 ml-0"
+        style="background-color: whitesmoke; border-bottom: 1px solid lightgrey"
+      >
+        <div
+          class="column is-3-desktop is-3-tablet is-3-widescreen is-3-fullhd is-4-mobile"
+        >
+          E-Mail
+        </div>
+        <div
+          class="column is-4-desktop is-4-tablet is-4-widescreen is-4-fullhd is-4-mobile"
+        >
+          Name
+        </div>
+        <div
+          class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile"
+        >
+          Nutzerrolle
+        </div>
+        <div
+          class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile has-text-right"
+        >
+        </div>
+      </div>
+
+      <div v-for="user in users" :key="user.uid" class="row">
+        <div class="columns is-mobile is-centered mb-0 mt-0 mr-0 ml-0">
+          <div style="
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              "
+            class="column is-3-desktop is-3-tablet is-3-widescreen is-3-fullhd is-4-mobile"
           >
-            <span class="tag is-dark is-rounded">{{ course.id }}</span>
+            <span
+              
+              >{{ user.email }}</span
+            >
           </div>
           <div
-            class="column is-8-desktop is-8-tablet is-8-widescreen is-8-fullhd is-half-mobile"
-            style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+            class="column is-4-desktop is-4-tablet is-4-widescreen is-4-fullhd is-4-mobile"
+            style="
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            "
           >
-            <span class="ml-2">{{ course.courseName }}</span>
+            <span>{{ user.displayName }} </span>
           </div>
           <div
-            class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-one-quarter-mobile"
+          style="
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              "
+            class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile"
+          >
+            <span class="tag is-small is-dark">
+              {{ user.role }}
+            </span>
+          </div>
+          <div
+          style="
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              "
+            class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile"
           >
             <div class="buttons is-right">
               <span
-                class="tag is-small is-primary"
+                class="tag tag-button is-small is-primary"
                 @click="openCourseDetails()"
               >
                 Verwalten
@@ -36,28 +89,32 @@
             </div>
           </div>
         </div>
-      </div> -->
-      <hr class="mb-0">
+      </div>
+      <hr class="mb-0" />
       <p class="panel-tabs">
         <a class="is-active">Alle</a>
-        <a>Ohne Bearbeiter</a>
-        <a>Deaktiviert</a>
+        <a>Studenten</a>
+        <a>Ticketbearbeiter</a>
+        <a>Administratoren</a>
       </p>
     </div>
   </nav>
 </template>
 
 <script>
+import { getUsers } from "../store/firebase";
 import { useRouter } from "vue-router";
 export default {
   setup() {
     const router = useRouter();
+    const users = getUsers();
     function openCourseDetails() {
       router.push("/course-detail-view");
     }
     // console.log(courses);
     return {
       openCourseDetails,
+      users,
     };
   },
 };
@@ -70,7 +127,7 @@ export default {
 .row:nth-child(even) {
   background-color: white;
 }
-.tag:hover {
+.tag-button:hover {
   background-color: #00c4a7;
   border-color: transparent;
   color: #fff;
