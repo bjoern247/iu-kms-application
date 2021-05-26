@@ -40,22 +40,27 @@
         </div>
       </div>
     </div>
-    <div
+        <div
       class="column is-half-desktop is-one-third-widescreen is-one-quarter-fullhd"
     >
       <div class="box">
-        <p class="title">Konto</p>
+        <p class="title">Benutzer</p>
         <p class="subtitle">
-          {{ userData.displayName }}
-          <span class="tag is-danger">Admin</span>
+          Gesperrt <span class="tag is-rounded is-dark">0</span>
         </p>
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">
               <p class="control">
-                <a class="button is-danger is-fullwidth" @click="logout()"
-                  >Logout</a
+                <router-link
+                  to="/user-overview"
+                  class="button is-primary is-fullwidth"
                 >
+                  <span class="icon is-small">
+                    <i class="far fa-edit"></i>
+                  </span>
+                  <span>Verwaltung</span>
+                </router-link>
               </p>
             </div>
           </div>
@@ -91,27 +96,22 @@
         </div>
       </div>
     </div>
-    <div
+        <div
       class="column is-half-desktop is-one-third-widescreen is-one-quarter-fullhd"
     >
       <div class="box">
-        <p class="title">Benutzer</p>
+        <p class="title">Konto</p>
         <p class="subtitle">
-          Gesperrt <span class="tag is-rounded is-dark">0</span>
+          {{ userData.displayName }}
+          <span class="tag is-danger">Admin</span>
         </p>
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">
               <p class="control">
-                <router-link
-                  to="/user-overview"
-                  class="button is-primary is-fullwidth"
+                <a class="button is-danger is-fullwidth" @click="logout()"
+                  >Logout</a
                 >
-                  <span class="icon is-small">
-                    <i class="far fa-edit"></i>
-                  </span>
-                  <span>Verwaltung</span>
-                </router-link>
               </p>
             </div>
           </div>

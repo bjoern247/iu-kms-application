@@ -9,12 +9,7 @@
         </span>
       </p>
     </div>
-    <p class="panel-tabs">
-      <a class="is-active">Alle</a>
-      <a>Ohne Bearbeiter</a>
-      <a>Deaktiviert</a>
-    </p>
-    <div class="box p-0 pb-1">
+    <div class="box p-0 pb-">
       <div v-for="course in courses" :key="course.id" class="row">
         <div class="columns is-mobile is-centered mt-2 pr-4 pl-4">
           <div
@@ -24,7 +19,7 @@
           </div>
           <div
             class="column is-8-desktop is-8-tablet is-8-widescreen is-8-fullhd is-half-mobile"
-            style="overflow: hidden; overflow: hidden; white-space: nowrap"
+            style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
           >
             <span class="ml-2">{{ course.courseName }}</span>
           </div>
@@ -42,7 +37,12 @@
           </div>
         </div>
       </div>
-      <hr>
+      <hr class="mb-0">
+      <p class="panel-tabs">
+        <a class="is-active">Alle</a>
+        <a>Ohne Bearbeiter</a>
+        <a>Deaktiviert</a>
+      </p>
     </div>
   </nav>
 </template>
@@ -82,5 +82,9 @@ export default {
 .box {
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
+}
+.panel-tabs {
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
 }
 </style>

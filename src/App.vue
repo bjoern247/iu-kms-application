@@ -3,8 +3,8 @@
     <div class="columns is-centered is-vcentered">
       <div class="column is-12-desktop is-two-thirds-widescreen is-half-fullhd">
         <div class="box">
-          <nav class="level has-text-left">
-            <div class="level-item has-text-centered">
+          <nav class="level has-text-centered">
+            <div class="level-item has-text-centered mb-0">
               <router-link
                 to="/"
                 class="button is-dark"
@@ -24,7 +24,7 @@
                 </span>
               </button>
             </div>
-            <div class="level-item has-text-centered">
+            <div class="level-item has-text-centered mb-0">
               <p class="is-size-2 is-hidden-mobile">
                 IU Korrekturmanagementsystem
               </p>
@@ -35,7 +35,7 @@
                 IU KMS
               </p>
             </div>
-            <div class="level-item has-text-centered is-hidden-mobile">
+            <div class="level-item has-text-centered is-hidden-mobile mb-0">
               <button
                 class="button is-dark"
                 v-if="$route.name !== 'Home' && $route.name !== 'Login'"
@@ -71,7 +71,7 @@
       <div class="column is-12-desktop is-two-thirds-widescreen is-half-fullhd">
         <div class="box">
           <nav class="level">
-            <p class="level-item has-text-centered is-hidden-mobile">
+            <p class="level-item is-hidden-mobile">
               <svg
                 data-t-c="Main Menu"
                 data-t-a="click"
@@ -88,19 +88,19 @@
                 ></path>
               </svg>
             </p>
-            <p class="level-item has-text-centered">
+            <p class="level-item">
               <a class="link is-info" href="https://www.iu.de/impressum/"
                 >Impressum</a
               >
             </p>
-            <p class="level-item has-text-centered">
+            <p class="level-item">
               <a class="link is-info" href="https://www.iu.de/datenschutz/"
                 >Datenschutzerklärung</a
               >
             </p>
-            <div class="level-item has-text-centered">
+            <div class="level-item">
               <button
-                class="button is-danger"
+                class="button is-danger is-pulled-right"
                 v-if="$route.name !== 'Home' && $route.name !== 'Login'"
                 @click="logout()"
               >
