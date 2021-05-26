@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
-import useFirebaseAuth from "./store/user";
+import useFirebaseAuth from "./store/firebase";
 require('./main.scss');
 
 const { authCheck } = useFirebaseAuth();

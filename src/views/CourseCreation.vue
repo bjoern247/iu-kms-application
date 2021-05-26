@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { createCourse } from "../store/data";
+import { createCourse } from "../store/firebase";
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 export default {

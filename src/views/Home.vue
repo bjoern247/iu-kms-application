@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import useFirebaseAuth from "../store/user";
+import useFirebase from "../store/firebase";
 import StudentView from "./roles/StudentView";
 import EditorView from "./roles/EditorView";
 import AdminView from "./roles/AdminView";
@@ -18,7 +18,7 @@ export default {
     AdminView,
   },
   setup() {
-    const state = useFirebaseAuth();
+    const state = useFirebase();
     const userData = state.userData.value;
     return {
       userData

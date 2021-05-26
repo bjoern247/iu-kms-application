@@ -1,4 +1,4 @@
-import { reactive, toRefs } from 'vue';
+import { reactive, toRefs, ref } from 'vue';
 import { useRouter } from "vue-router";
 import firebase from "firebase";
 // Required for side-effects
@@ -14,6 +14,14 @@ const config = {
 };
 firebase.initializeApp(config);
 
+const db = firebase.firestore();
+// const usersCollection = db.collection('users');
+const courseCollection = db.collection('courses');
+const userCollection = db.collection('users');
+const subscribers = [];
+const courses = ref([]);
+const users = ref([]);
+
 const state = reactive({
   user: null,
   initialized: false,
@@ -26,11 +34,10 @@ const state = reactive({
   })
 });
 
-
-
 export default function () {
   const router = useRouter();
   const logout = () => {
+
     firebase
       .auth()
       .signOut()
@@ -40,6 +47,7 @@ export default function () {
         state.initialized = false;
         state.error = null;
         router.push("/login");
+        unsubscribeAllListeners();
       })
       .catch((error) => {
         console.log(error);
@@ -51,7 +59,7 @@ export default function () {
         firebase.auth().onAuthStateChanged(async (_user) => {
           if (_user) {
             state.user = _user;
-            firebase.firestore().collection("users")
+            userCollection
               .doc(_user.uid)
               .onSnapshot((doc) => {
                 const _data = doc.data();
@@ -60,6 +68,8 @@ export default function () {
                 state.userData.email = _data.email;
                 state.userData.role = _data.role;
                 state.userData.uid = _data.uid;
+                console.log("AuthCheck");
+                startAllListerners();
               });
           } else {
             state.user = null;
@@ -74,6 +84,54 @@ export default function () {
     // FUNCTIONS
     logout,
     authCheck,
+    courses,
+    users
   };
+}
+
+export const useLoadCourses = () => {
+  const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
+    courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    console.log('Subscription happening');
+  })
+  subscribers.push(coursesSubscriber);
+  return courses
+}
+
+export const getCourses = () => {
+  return courses
+}
+
+export const useLoadUsers = () => {
+  const usersSubscriber = userCollection.onSnapshot(snapshot => {
+    users.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    console.log('Subscription happening');
+  })
+  subscribers.push(usersSubscriber);
+  return users
+}
+
+export const getUsers = () => {
+  return users
+}
+
+export const createCourse = (id, courseName) => {
+  console.log(id)
+  return courseCollection.doc(id).set({
+    courseName: courseName,
+    id: id
+  }).then(() => {
+  })
+}
+
+export const startAllListerners = () => {
+  useLoadCourses();
+  useLoadUsers();
+}
+export const unsubscribeAllListeners = () => {
+  // called by auth.js on user signout to unsubscribe all firestore realtime listeners
+  console.log(subscribers);
+  console.log('Unsubscribing all realtime listeners');
+  subscribers.forEach(subscriber => subscriber());
 }
 

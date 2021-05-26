@@ -63,7 +63,7 @@
   </div>
 </template>
 <script>
-import useFirebaseAuth from "../../store/user";
+import useFirebaseAuth from "../../store/firebase";
 export default {
   name: "EditorView",
   setup() {

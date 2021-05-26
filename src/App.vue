@@ -25,7 +25,7 @@
               </button>
             </div>
             <div class="level-item has-text-centered mb-0">
-              <p class="is-size-2 is-hidden-mobile">
+              <p class="is-size-2 is-hidden-touch">
                 IU Korrekturmanagementsystem
               </p>
               <p
@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import useFirebaseAuth from "./store/user";
+import useFirebaseAuth from "./store/firebase";
 import { useRouter } from "vue-router";
 export default {
   setup() {

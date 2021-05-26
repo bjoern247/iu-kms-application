@@ -28,7 +28,7 @@
           >
             <div class="buttons is-right">
               <span
-                class="tag is-small is-primary"
+                class="tag tag-button is-small is-primary"
                 @click="openCourseDetails()"
               >
                 Verwalten
@@ -48,16 +48,15 @@
 </template>
 
 <script>
-import { useLoadCourses } from "../store/data";
+import { getCourses } from "../store/firebase";
 import { useRouter } from "vue-router";
 export default {
   setup() {
-    const courses = useLoadCourses();
+    const courses = getCourses();
     const router = useRouter();
     function openCourseDetails() {
       router.push("/course-detail-view");
     }
-    console.log(courses);
     return {
       courses,
       openCourseDetails,
@@ -73,7 +72,7 @@ export default {
 .row:nth-child(even) {
   background-color: white;
 }
-.tag:hover {
+.tag-button:hover {
   background-color: #00c4a7;
   border-color: transparent;
   color: #fff;
