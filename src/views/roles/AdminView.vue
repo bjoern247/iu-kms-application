@@ -59,7 +59,7 @@
                   <span class="icon is-small">
                     <i class="far fa-edit"></i>
                   </span>
-                  <span>Verwaltung</span>
+                  <span>Verwalten</span>
                 </router-link>
               </p>
             </div>
@@ -88,7 +88,7 @@
                   <span class="icon is-small">
                     <i class="far fa-edit"></i>
                   </span>
-                  <span>Verwaltung</span>
+                  <span>Verwalten</span>
                 </router-link>
               </p>
             </div>

@@ -1,6 +1,6 @@
 <template>
       <div class="box">
-        <p class="title">Kursverwaltung</p>
+        <p class="title">Benutzerverwaltung</p>
         <!-- <form @submit.prevent="onSubmit">
           <div class="columns">
             <div class="column is-8">

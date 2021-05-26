@@ -11,11 +11,11 @@
     </div>
     <div class="box p-0 pb-">
       <div v-for="course in courses" :key="course.id" class="row">
-        <div class="columns is-mobile is-centered mt-2 pr-4 pl-4">
+        <div class="columns is-mobile is-centered is-vcentered mt-2 pr-4 pl-4">
           <div
             class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-one-quarter-mobile"
           >
-            <span class="tag is-dark is-rounded">{{ course.id }}</span>
+            <span class="tag is-dark is-medium">{{ course.id }}</span>
           </div>
           <div
             class="column is-8-desktop is-8-tablet is-8-widescreen is-8-fullhd is-half-mobile"
@@ -26,13 +26,15 @@
           <div
             class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-one-quarter-mobile"
           >
-            <div class="buttons is-right">
-              <span
-                class="tag tag-button is-small is-primary"
+                        <div class="buttons is-right">
+              <button
+                class="button is-primary is-pulled-right"
                 @click="openCourseDetails()"
               >
-                Verwalten
-              </span>
+                <span class="icon">
+                  <i class="fas fa-edit"></i>
+                </span>
+              </button>
             </div>
           </div>
         </div>

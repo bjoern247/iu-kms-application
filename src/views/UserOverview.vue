@@ -15,42 +15,39 @@
         style="background-color: whitesmoke; border-bottom: 1px solid lightgrey"
       >
         <div
-          class="column is-3-desktop is-3-tablet is-3-widescreen is-3-fullhd is-4-mobile"
+          class="column is-3-desktop is-3-tablet is-3-widescreen is-4-fullhd is-2-mobile"
         >
           E-Mail
         </div>
         <div
-          class="column is-4-desktop is-4-tablet is-4-widescreen is-4-fullhd is-4-mobile"
+          class="column is-4-desktop is-4-tablet is-4-widescreen is-3-fullhd is-5-mobile"
         >
           Name
         </div>
         <div
-          class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile"
+          class="column is-2-desktop is-2-tablet is-2-widescreen is-3-fullhd is-2-mobile"
         >
           Nutzerrolle
         </div>
         <div
-          class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile has-text-right"
-        >
-        </div>
+          class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-3-mobile has-text-right"
+        ></div>
       </div>
 
       <div v-for="user in users" :key="user.uid" class="row">
-        <div class="columns is-mobile is-centered mb-0 mt-0 mr-0 ml-0">
-          <div style="
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-              "
-            class="column is-3-desktop is-3-tablet is-3-widescreen is-3-fullhd is-4-mobile"
+        <div class="columns is-mobile is-centered is-vcentered mb-0 mt-0 mr-0 ml-0">
+          <div
+            style="
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            "
+            class="column is-3-desktop is-3-tablet is-3-widescreen is-4-fullhd is-2-mobile"
           >
-            <span
-              
-              >{{ user.email }}</span
-            >
+            <span>{{ user.email }}</span>
           </div>
           <div
-            class="column is-4-desktop is-4-tablet is-4-widescreen is-4-fullhd is-4-mobile"
+            class="column is-4-desktop is-4-tablet is-4-widescreen is-3-fullhd is-5-mobile"
             style="
               overflow: hidden;
               white-space: nowrap;
@@ -60,32 +57,36 @@
             <span>{{ user.displayName }} </span>
           </div>
           <div
-          style="
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-              "
-            class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile"
+            class="column is-2-desktop is-2-tablet is-2-widescreen is-3-fullhd is-3-mobile"
           >
-            <span class="tag is-small is-dark">
-              {{ user.role }}
+            <span v-if="user.role === 'student'" class="tag is-medium is-info">
+              Student
+            </span>
+            <span
+              v-else-if="user.role === 'editor'"
+              class="tag is-medium is-warning"
+            >
+              Bearbeiter
+            </span>
+            <span
+              v-else-if="user.role === 'admin'"
+              class="tag is-medium is-danger"
+            >
+              Admin
             </span>
           </div>
           <div
-          style="
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-              "
             class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile"
           >
             <div class="buttons is-right">
-              <span
-                class="tag tag-button is-small is-primary"
-                @click="openCourseDetails()"
+              <button
+                class="button is-primary is-pulled-right"
+                @click="openUserDetails()"
               >
-                Verwalten
-              </span>
+                <span class="icon">
+                  <i class="fas fa-edit"></i>
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -108,12 +109,12 @@ export default {
   setup() {
     const router = useRouter();
     const users = getUsers();
-    function openCourseDetails() {
-      router.push("/course-detail-view");
+    function openUserDetails() {
+      router.push("/user-detail-view");
     }
     // console.log(courses);
     return {
-      openCourseDetails,
+      openUserDetails,
       users,
     };
   },
