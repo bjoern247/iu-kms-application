@@ -36,13 +36,23 @@
           <div
             class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-one-quarter-mobile"
           >
-            <div class="buttons is-right">
+            <div v-if="userData.role === 'admin'" class="buttons is-right">
               <button
                 class="button is-primary is-pulled-right"
-                @click="openCourseDetails(course.id)"
+                @click="editCourse(course.id)"
               >
                 <span class="icon">
                   <i class="fas fa-edit"></i>
+                </span>
+              </button>
+            </div>
+            <div v-else class="buttons is-right">
+              <button
+                class="button is-info is-pulled-right"
+                @click="viewCourseDetails(course.id)"
+              >
+                <span class="icon">
+                  <i class="far fa-eye"></i>
                 </span>
               </button>
             </div>
@@ -60,19 +70,25 @@
 </template>
 
 <script>
-import { getCourses } from "../store/firebase";
+import useFirebase, { getCourses } from "../store/firebase";
 import { useRouter } from "vue-router";
 export default {
   setup() {
     const courses = getCourses();
     const router = useRouter();
-    console.log(courses.value);
-    function openCourseDetails(id) {
+    const state = useFirebase();
+    const userData = state.userData.value;
+    function editCourse(id) {
+      router.push("/course-edit/"+id);
+    }
+    function viewCourseDetails(id) {
       router.push("/course-detail-view/"+id);
     }
     return {
       courses,
-      openCourseDetails,
+      editCourse,
+      userData,
+      viewCourseDetails
     };
   },
 };

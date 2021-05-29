@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
-import useFirebaseAuth from '../store/firebase';
+import useFirebaseAuth, { enableBackButton } from '../store/firebase';
 
 const state = useFirebaseAuth();
 
@@ -60,6 +60,17 @@ const routes = [
   },
   {
     path: '/course-detail-view/:id',
+    name: 'CourseDetailView',
+    // route level code-splitting
+    // this generates a separate chunk (tickets.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/CourseDetailView.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/course-edit/:id',
     name: 'CourseAdministration',
     // route level code-splitting
     // this generates a separate chunk (tickets.[hash].js) for this route
@@ -124,6 +135,10 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     next();
+  }
+  if (to.path == '/') {
+    // Enables BackButton again after Delete Operations
+    enableBackButton();
   }
 });
 
