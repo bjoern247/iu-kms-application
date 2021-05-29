@@ -72,6 +72,7 @@
                 <button
                   class="button is-dark"
                   v-if="$route.name !== 'Home' && $route.name !== 'Login'"
+                  :disabled="backButtonState"
                   @click="goBack()"
                 >
                   <span class="icon">
@@ -97,18 +98,20 @@
 </template>
 
 <script>
-import useFirebaseAuth from "./store/firebase";
+import useFirebaseAuth, { getbackButtonState } from "./store/firebase";
 import { useRouter } from "vue-router";
 export default {
   setup() {
     const { logout } = useFirebaseAuth();
     const router = useRouter();
+    const backButtonState = getbackButtonState();
     function goBack() {
       router.back();
     }
     return {
       logout,
       goBack,
+      backButtonState
     };
   },
 };

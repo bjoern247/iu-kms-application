@@ -21,6 +21,7 @@ const userCollection = db.collection('users');
 const subscribers = [];
 const courses = ref([]);
 const users = ref([]);
+const backButtonDisabled = ref(false);
 
 const state = reactive({
   user: null,
@@ -105,7 +106,7 @@ export const loadCourses = () => {
 }
 
 export const getCourses = () => {
-  return courses
+  return courses.value;
 }
 
 export const getCourse = (id) => {
@@ -127,9 +128,10 @@ export const loadUsers = () => {
 }
 
 export const getUsers = () => {
-  return users
+  return users.value
 }
 
+// Kurs erstellen
 export const createCourse = (id, courseName) => {
   return new Promise((resolve, reject) => {
     // Create array with found duplicates
@@ -157,6 +159,7 @@ export const createCourse = (id, courseName) => {
   })
 }
 
+// Kurs bearbeiten
 export const updateCourse = (doc, courseId, courseName) => {
   return new Promise((resolve, reject) => {
     courseCollection.doc(doc).update({
@@ -171,6 +174,19 @@ export const updateCourse = (doc, courseId, courseName) => {
   })
 }
 
+// Kurs löschen
+export const deleteCourse = (doc) => {
+  return new Promise((resolve, reject) => {
+    courseCollection.doc(doc).delete().then(() => {
+      resolve(true);
+      disableBackButton();
+    }).catch((error) => {
+      alert(error);
+      reject();
+    })
+  })
+}
+
 export const startAllListerners = () => {
   return new Promise((resolve) => {
     loadUsers();
@@ -179,6 +195,18 @@ export const startAllListerners = () => {
     })
   })
 }
+
+export const disableBackButton = () => {
+  backButtonDisabled.value = true;
+}
+
+export const enableBackButton = () => {
+  backButtonDisabled.value = false;
+}
+
+export const getbackButtonState = () => {
+  return backButtonDisabled;
+} 
 
 export const unsubscribeAllListeners = () => {
   // called by auth.js on user signout to unsubscribe all firestore realtime listeners
