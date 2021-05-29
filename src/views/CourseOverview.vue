@@ -15,21 +15,31 @@
           <div
             class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-one-quarter-mobile"
           >
-            <span class="tag is-dark is-medium">{{ course.id }}</span>
+            <span class="tag is-dark is-medium">{{ course.courseId }}</span>
           </div>
           <div
             class="column is-8-desktop is-8-tablet is-8-widescreen is-8-fullhd is-half-mobile"
-            style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+            style="
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            "
           >
-            <span class="ml-2">{{ course.courseName }}</span>
+            <span v-if="course.editors.length != 0" class="icon">
+              <i class="fas fa-user-check"></i>
+            </span>
+            <span v-else class="icon">
+              <i class="fas fa-user-times"></i>
+            </span>
+            <span class="ml-1">{{ course.courseName }}</span>
           </div>
           <div
             class="column is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-one-quarter-mobile"
           >
-                        <div class="buttons is-right">
+            <div class="buttons is-right">
               <button
                 class="button is-primary is-pulled-right"
-                @click="openCourseDetails()"
+                @click="openCourseDetails(course.id)"
               >
                 <span class="icon">
                   <i class="fas fa-edit"></i>
@@ -39,9 +49,9 @@
           </div>
         </div>
       </div>
-      <hr class="mb-0">
+      <hr class="mb-0" />
       <p class="panel-tabs">
-        <a class="is-active">Alle</a>
+        <a class="is-active">Aktiv</a>
         <a>Ohne Bearbeiter</a>
         <a>Deaktiviert</a>
       </p>
@@ -56,8 +66,9 @@ export default {
   setup() {
     const courses = getCourses();
     const router = useRouter();
-    function openCourseDetails() {
-      router.push("/course-detail-view");
+    console.log(courses.value);
+    function openCourseDetails(id) {
+      router.push("/course-detail-view/"+id);
     }
     return {
       courses,

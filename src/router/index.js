@@ -59,7 +59,7 @@ const routes = [
     }
   },
   {
-    path: '/course-detail-view',
+    path: '/course-detail-view/:id',
     name: 'CourseAdministration',
     // route level code-splitting
     // this generates a separate chunk (tickets.[hash].js) for this route

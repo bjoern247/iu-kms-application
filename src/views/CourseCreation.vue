@@ -56,7 +56,10 @@
                 :class="{ 'is-loading': loading }"
                 type="submit"
               >
-                Speichern
+                <span class="icon is-small">
+                  <i class="fas fa-save"></i>
+                </span>
+                <span>Speichern</span>
               </button>
             </div>
           </div>
@@ -80,11 +83,17 @@ export default {
     const loading = ref(false);
     const onSubmit = async () => {
       loading.value = true;
-      await createCourse(form.id, form.courseName);
-      form.id = "";
-      form.courseName = "";
-      loading.value = false;
-      router.push("/course-overview");
+      await createCourse(form.id, form.courseName).then(
+        () => {
+          form.id = "";
+          form.courseName = "";
+          loading.value = false;
+          router.push("/course-overview");
+        },
+        () => {
+          loading.value = false;
+        }
+      );
     };
     return {
       form,

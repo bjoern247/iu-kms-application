@@ -69,13 +69,16 @@ export default function () {
                 state.userData.role = _data.role;
                 state.userData.uid = _data.uid;
                 console.log("AuthCheck");
-                startAllListerners();
+                startAllListerners().then(() => {
+                  console.log(courses);
+                  resolve(true);
+                })
               });
           } else {
             state.user = null;
+            resolve(false);
           }
           state.initialized = true;
-          resolve(true);
         });
     });
   };
@@ -89,20 +92,32 @@ export default function () {
   };
 }
 
-export const useLoadCourses = () => {
-  const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
-    courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-    console.log('Subscription happening');
+export const loadCourses = () => {
+  return new Promise((resolve) => {
+    const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
+      courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      console.log('Subscription happening');
+      resolve(true);
+    })
+    subscribers.push(coursesSubscriber);
+    return courses
   })
-  subscribers.push(coursesSubscriber);
-  return courses
 }
 
 export const getCourses = () => {
   return courses
 }
 
-export const useLoadUsers = () => {
+export const getCourse = (id) => {
+  console.log(id);
+  const course = courses.value.filter((item) => {
+    return item.id === id
+  })
+  console.log(course);
+  return course[0];
+}
+
+export const loadUsers = () => {
   const usersSubscriber = userCollection.onSnapshot(snapshot => {
     users.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     console.log('Subscription happening');
@@ -116,18 +131,55 @@ export const getUsers = () => {
 }
 
 export const createCourse = (id, courseName) => {
-  console.log(id)
-  return courseCollection.doc(id).set({
-    courseName: courseName,
-    id: id
-  }).then(() => {
+  return new Promise((resolve, reject) => {
+    // Create array with found duplicates
+    console.log(id);
+    const duplicates = courses.value.filter((item) => {
+      return id.includes(item.id)
+    });
+    // Check if duplicate array is empty or not
+    if (duplicates.length === 0) {
+      // Course doesn't exist yet, so we can create it
+      courseCollection.doc().set({
+        courseName: courseName,
+        courseId: id,
+        editors: []
+      }).then(() => {
+        resolve();
+      }).catch((error) => {
+        alert(error);
+      });
+    } else {
+      // Course exists already
+      alert('Dieser Kurs existiert bereits!');
+      reject();
+    }
+  })
+}
+
+export const updateCourse = (doc, courseId, courseName) => {
+  return new Promise((resolve, reject) => {
+    courseCollection.doc(doc).update({
+      courseName: courseName,
+      courseId: courseId,
+    }).then(() => {
+      resolve(true);
+    }).catch((error) => {
+      alert(error);
+      reject();
+    });
   })
 }
 
 export const startAllListerners = () => {
-  useLoadCourses();
-  useLoadUsers();
+  return new Promise((resolve) => {
+    loadUsers();
+    loadCourses().then(() => {
+      resolve(true);
+    })
+  })
 }
+
 export const unsubscribeAllListeners = () => {
   // called by auth.js on user signout to unsubscribe all firestore realtime listeners
   console.log(subscribers);
