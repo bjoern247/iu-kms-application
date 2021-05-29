@@ -94,10 +94,10 @@ export default function () {
 }
 
 export const loadCourses = () => {
+  console.log('Subscription happening');
   return new Promise((resolve) => {
     const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
       courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-      console.log('Subscription happening');
       resolve(true);
     })
     subscribers.push(coursesSubscriber);
@@ -106,7 +106,7 @@ export const loadCourses = () => {
 }
 
 export const getCourses = () => {
-  return courses.value;
+  return courses
 }
 
 export const getCourse = (id) => {
@@ -114,21 +114,47 @@ export const getCourse = (id) => {
   const course = courses.value.filter((item) => {
     return item.id === id
   })
-  console.log(course);
   return course[0];
 }
 
 export const loadUsers = () => {
-  const usersSubscriber = userCollection.onSnapshot(snapshot => {
-    users.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-    console.log('Subscription happening');
+  console.log('Subscription happening');
+  return new Promise((resolve) => {
+    const usersSubscriber = userCollection.onSnapshot(snapshot => {
+      users.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.push(usersSubscriber);
+    return users
   })
-  subscribers.push(usersSubscriber);
+}
+
+// Erlaubt Komponenten den Zugriff auf
+export const getUsers = () => {
   return users
 }
 
-export const getUsers = () => {
-  return users.value
+export const getUser = (id) => {
+  console.log(id);
+  const user = users.value.filter((item) => {
+    return item.uid === id
+  })
+  console.log(user[0]);
+  return user[0];
+}
+
+// Nutzer bearbeiten
+export const updateUser = (doc, role) => {
+  return new Promise((resolve, reject) => {
+    userCollection.doc(doc).update({
+      role: role
+    }).then(() => {
+      resolve(true);
+    }).catch((error) => {
+      alert(error);
+      reject();
+    });
+  })
 }
 
 // Kurs erstellen
@@ -206,7 +232,7 @@ export const enableBackButton = () => {
 
 export const getbackButtonState = () => {
   return backButtonDisabled;
-} 
+}
 
 export const unsubscribeAllListeners = () => {
   // called by auth.js on user signout to unsubscribe all firestore realtime listeners

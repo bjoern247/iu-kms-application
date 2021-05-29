@@ -81,7 +81,7 @@
             <div class="buttons is-right">
               <button
                 class="button is-primary is-pulled-right"
-                @click="openUserDetails()"
+                @click="editUser(user.uid)"
               >
                 <span class="icon">
                   <i class="fas fa-edit"></i>
@@ -109,12 +109,12 @@ export default {
   setup() {
     const router = useRouter();
     const users = getUsers();
-    function openUserDetails() {
-      router.push("/user-detail-view");
+    function editUser(id) {
+      router.push("/user-detail-view/"+id);
     }
     // console.log(courses);
     return {
-      openUserDetails,
+      editUser,
       users,
     };
   },

@@ -1,80 +1,122 @@
 <template>
-      <div class="box">
-        <p class="title">Benutzerverwaltung</p>
-        <!-- <form @submit.prevent="onSubmit">
-          <div class="columns">
-            <div class="column is-8">
-              <div class="field">
-                <label class="label">Kursname</label>
-                <div class="control">
-                  <input
-                    class="input"
-                    type="text"
-                    v-model="form.courseName"
-                    placeholder="Kursname"
-                  />
-                </div>
+  <div class="box">
+    <p class="title">Benutzerverwaltung</p>
+    <form>
+      <div class="columns">
+        <div class="column is-7">
+          <fieldset disabled>
+            <div class="field">
+              <label class="label">Name</label>
+              <div class="control">
+                <input
+                  class="input"
+                  type="text"
+                  v-model="user.displayName"
+                  placeholder="Kursname"
+                />
               </div>
             </div>
-            <div class="column is-4">
-              <div class="field">
-                <label class="label">Kurskürzel</label>
-                <div class="control has-icons-right">
-                  <input
-                    class="input"
-                    type="text"
-                    v-model="form.id"
-                    placeholder="Kürzel"
-                  />
-                  <span v-if="false" class="icon is-small is-right">
-                    <i class="fas fa-check"></i>
-                  </span>
-                  <span v-if="false" class="icon is-small is-right">
-                    <i class="fas fa-exclamation-triangle"></i>
-                  </span>
-                </div>
+            <div class="field">
+              <label class="label">E-Mail</label>
+              <div class="control">
+                <input
+                  class="input"
+                  type="text"
+                  v-model="user.email"
+                  placeholder="Kursname"
+                />
               </div>
             </div>
-          </div>
-          <div class="columns">
-            <div class="column is-12">
-              <div class="field">
-                <div class="control">
-                  <button class="button is-primary" :class="{ 'is-loading': loading }" type="submit">
-                    Speichern
-                  </button>
-                </div>
+          </fieldset>
+        </div>
+        <div class="column is-5">
+          <div class="field">
+            <label class="label">Rolle</label>
+            <div class="control has-icons-right">
+              <div class="select">
+                <select v-model="user.role">
+                  <option>{{ user.role }}</option>
+                  <option>editor</option>
+                  <option>admin</option>
+                </select>
               </div>
             </div>
           </div>
-        </form> -->
+          <fieldset disabled>
+            <div class="field">
+              <label class="label">UID</label>
+              <div class="control has-icons-right">
+                <input
+                  class="input"
+                  type="text"
+                  v-model="user.uid"
+                  placeholder="Kürzel"
+                />
+              </div>
+            </div>
+          </fieldset>
+        </div>
       </div>
+      <div class="columns">
+        <div class="column is-12">
+          <div class="buttons">
+            <button
+              class="button is-primary"
+              :class="{ 'is-loading': saveOperationLoading }"
+              type="submit"
+            >
+              <span class="icon is-small">
+                <i class="fas fa-save"></i>
+              </span>
+              <span>Speichern</span>
+            </button>
+            <button
+              class="button is-dark"
+              type="button"
+              @click="submitDeactivation()"
+            >
+              <span class="icon is-small">
+                <i class="fas fa-ban"></i>
+              </span>
+              <span>Deaktivieren</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script>
-import { createCourse } from "../store/firebase";
-import { reactive, ref } from "vue";
+import { getUser, updateUser } from "../store/firebase";
 import { useRouter } from "vue-router";
+import { ref } from 'vue';
 export default {
   setup() {
-    const form = reactive({
-      id: "",
-      courseName: "",
-    });
     const router = useRouter();
-    const loading = ref(false);
-    const onSubmit = async () => {
-      loading.value = true;
-      await createCourse(form.id, form.courseName);
-      form.id = "";
-      form.courseName = "";
-      loading.value = false;
-      router.push("/course-overview");
+    const saveOperationLoading = ref(false);
+    const user = getUser(router.currentRoute.value.params.id);
+    console.log(user);
+    const submitSave = async () => {
+      saveOperationLoading.value = true;
+      await updateUser(user.id, user.role).then(
+        () => {
+          saveOperationLoading.value = false;
+          router.push("/course-overview");
+        },
+        () => {
+          saveOperationLoading.value = false;
+        }
+      );
+    };
+    const submitDeactivation = async () => {
+      alert("Diese Funktion ist noch nicht implementiert!");
     };
     return {
-      form,
-      loading,
-      onSubmit,
+      user,
+      submitDeactivation,
+      submitSave,
+      saveOperationLoading
     };
   },
 };

@@ -49,17 +49,6 @@
       </div>
       <div class="columns">
         <div class="column is-12">
-          <!-- <div class="field">
-            <div class="control">
-              <button
-                class="button is-primary"
-                :class="{ 'is-loading': loading }"
-                type="submit"
-              >
-                Speichern
-              </button>
-            </div>
-          </div> -->
           <div class="buttons">
             <button
               class="button is-primary"

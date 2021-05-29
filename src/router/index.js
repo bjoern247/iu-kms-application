@@ -81,7 +81,7 @@ const routes = [
     }
   },
   {
-    path: '/user-detail-view',
+    path: '/user-detail-view/:id',
     name: 'UserAdministration',
     // route level code-splitting
     // this generates a separate chunk (tickets.[hash].js) for this route
