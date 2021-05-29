@@ -71,7 +71,7 @@
               </span>
               <span>Speichern</span>
             </button>
-            <button class="button is-dark" type="button">
+            <button class="button is-dark" type="button" @click="submitDeactivation()">
               <span class="icon is-small">
                 <i class="fas fa-comment-slash"></i>
               </span>
@@ -137,12 +137,16 @@ export default {
         deleteOperationLoading.value = false;
       }
     };
+    const submitDeactivation = async () => {
+      alert("Diese Funktion ist noch nicht implementiert!");
+    };
     return {
       deleteOperationLoading,
       saveOperationLoading,
       submitSave,
       course,
       submitDelete,
+      submitDeactivation
     };
   },
 };

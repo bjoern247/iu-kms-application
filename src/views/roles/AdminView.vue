@@ -46,7 +46,8 @@
       <div class="box">
         <p class="title">Benutzer</p>
         <p class="subtitle">
-          Gesperrt <span class="tag is-rounded is-dark">0</span>
+          Gesamt <span class="tag is-rounded is-dark">{{users.length}}</span>
+          Gesperrt <span class="tag is-rounded is-warning">0</span>
         </p>
         <div class="field is-horizontal">
           <div class="field-body">
@@ -121,18 +122,20 @@
   </div>
 </template>
 <script>
-import useFirebaseAuth, { getCourses } from "../../store/firebase";
+import useFirebaseAuth, { getCourses, getUsers } from "../../store/firebase";
 export default {
   name: "AdminView",
   setup() {
     const state = useFirebaseAuth();
-    const courses = getCourses()
+    const courses = getCourses();
+    const users = getUsers();
     const { logout } = useFirebaseAuth();
     const userData = state.userData.value;
     return {
       userData,
       logout,
-      courses
+      courses,
+      users
     };
   },
 };
