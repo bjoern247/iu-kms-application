@@ -106,6 +106,7 @@ export const loadCourses = () => {
 }
 
 export const getCourses = () => {
+  console.log(courses);
   return courses
 }
 

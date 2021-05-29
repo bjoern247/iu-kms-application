@@ -1,7 +1,7 @@
 <template>
   <div class="box">
     <p class="title">Benutzerverwaltung</p>
-    <form>
+    <form @submit.prevent="submitSave">
       <div class="columns">
         <div class="column is-7">
           <fieldset disabled>
@@ -35,7 +35,7 @@
             <div class="control has-icons-right">
               <div class="select">
                 <select v-model="user.role">
-                  <option>{{ user.role }}</option>
+                  <option>student</option>
                   <option>editor</option>
                   <option>admin</option>
                 </select>
@@ -84,6 +84,8 @@
         </div>
       </div>
     </form>
+    <p class="title mt-4 mb-2">Benutzertickets</p>
+    <p class="is-size-5">Dieses Feature wurde noch nicht implementiert</p>
   </div>
 </template>
 
@@ -96,13 +98,12 @@ export default {
     const router = useRouter();
     const saveOperationLoading = ref(false);
     const user = getUser(router.currentRoute.value.params.id);
-    console.log(user);
     const submitSave = async () => {
       saveOperationLoading.value = true;
       await updateUser(user.id, user.role).then(
         () => {
           saveOperationLoading.value = false;
-          router.push("/course-overview");
+          router.push("/user-overview");
         },
         () => {
           saveOperationLoading.value = false;

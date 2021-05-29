@@ -15,17 +15,6 @@
               />
             </div>
           </div>
-          <!-- <div class="field">
-              <label class="label">Kursverantwortlicher</label>
-              <div class="control">
-                <div class="select">
-                  <select>
-                    <option>Auswählen</option>
-                    <option>With options</option>
-                  </select>
-                </div>
-              </div>
-            </div> -->
         </div>
         <div class="column is-4">
           <div class="field">
