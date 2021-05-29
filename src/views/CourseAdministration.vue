@@ -1,7 +1,7 @@
 <template>
   <div class="box">
     <p class="title">Kursverwaltung</p>
-    <form @submit.prevent="onSubmit">
+    <form @submit.prevent="submitSave">
       <div class="columns">
         <div class="column is-8">
           <div class="field">
@@ -63,7 +63,7 @@
           <div class="buttons">
             <button
               class="button is-primary"
-              :class="{ 'is-loading': loading }"
+              :class="{ 'is-loading': saveOperationLoading }"
               type="submit"
             >
               <span class="icon is-small">
@@ -77,7 +77,12 @@
               </span>
               <span>Deaktivieren</span>
             </button>
-            <button class="button is-danger" type="button">
+            <button
+              class="button is-danger"
+              :class="{ 'is-loading': deleteOperationLoading }"
+              type="button"
+              @click="submitDelete()"
+            >
               <span class="icon is-small">
                 <i class="fas fa-trash-alt"></i>
               </span>
@@ -91,7 +96,7 @@
 </template>
 
 <script>
-import { getCourse, updateCourse } from "../store/firebase";
+import { getCourse, updateCourse, deleteCourse } from "../store/firebase";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 export default {
@@ -99,23 +104,45 @@ export default {
     const router = useRouter();
     const course = getCourse(router.currentRoute.value.params.id);
     // console.log(course[0].id);
-    const loading = ref(false);
-    const onSubmit = async () => {
-      loading.value = true;
+    const saveOperationLoading = ref(false);
+    const deleteOperationLoading = ref(false);
+    const submitSave = async () => {
+      saveOperationLoading.value = true;
       await updateCourse(course.id, course.courseId, course.courseName).then(
         () => {
-          loading.value = false;
+          saveOperationLoading.value = false;
           router.push("/course-overview");
         },
         () => {
-          loading.value = false;
+          saveOperationLoading.value = false;
         }
       );
     };
+    const submitDelete = async () => {
+      deleteOperationLoading.value = true;
+      const result = confirm(
+        "Das Löschen kann nicht rückgängig gemacht werden!"
+      );
+      if (result) {
+        await deleteCourse(course.id).then(
+          () => {
+            deleteOperationLoading.value = false;
+            router.push("/course-overview");
+          },
+          () => {
+            deleteOperationLoading.value = false;
+          }
+        );
+      } else {
+        deleteOperationLoading.value = false;
+      }
+    };
     return {
-      loading,
-      onSubmit,
+      deleteOperationLoading,
+      saveOperationLoading,
+      submitSave,
       course,
+      submitDelete,
     };
   },
 };
