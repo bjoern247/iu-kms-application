@@ -92,7 +92,7 @@
         </div>
       </div>
       <hr class="mb-0" />
-      <p class="panel-tabs" v-if="user.role === 'admin'">
+      <p class="panel-tabs">
         <a class="is-active">Alle</a>
         <a>Studenten</a>
         <a>Ticketbearbeiter</a>
