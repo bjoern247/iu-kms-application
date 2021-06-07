@@ -8,9 +8,9 @@
 
 <script>
 import useFirebase from "../store/firebase";
-import StudentView from "./roles/StudentView";
-import EditorView from "./roles/EditorView";
-import AdminView from "./roles/AdminView";
+import StudentView from "./student/StudentView";
+import EditorView from "./editor/EditorView";
+import AdminView from "./admin/AdminView";
 export default {
   components: {
     StudentView,

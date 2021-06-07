@@ -59,15 +59,16 @@
             </p>
             <div class="level-item">
               <div class="buttons">
-                <router-link
+                <button
                   to="/"
                   class="button is-dark"
                   v-if="$route.name !== 'Home' && $route.name !== 'Login'"
+                  @click="goHome()"
                 >
                   <span class="icon">
                     <i class="fas fa-home"></i>
                   </span>
-                </router-link>
+                </button>
 
                 <button
                   class="button is-dark"
@@ -98,7 +99,7 @@
 </template>
 
 <script>
-import useFirebaseAuth, { getbackButtonState } from "./store/firebase";
+import useFirebaseAuth, { getbackButtonState, stopCourseListeners } from "./store/firebase";
 import { useRouter } from "vue-router";
 export default {
   setup() {
@@ -108,10 +109,15 @@ export default {
     function goBack() {
       router.back();
     }
+    function goHome() {
+      stopCourseListeners();
+      router.push('/');
+    }
     return {
       logout,
       goBack,
-      backButtonState
+      backButtonState,
+      goHome
     };
   },
 };

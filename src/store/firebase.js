@@ -18,9 +18,12 @@ const db = firebase.firestore();
 // const usersCollection = db.collection('users');
 const courseCollection = db.collection('courses');
 const userCollection = db.collection('users');
-const subscribers = [];
+const subscribers = ref([]);
+const courseSubscribers = ref([]);
 const courses = ref([]);
 const users = ref([]);
+const unassignedEditors = ref([]);
+const assignedEditors = ref([]);
 const backButtonDisabled = ref(false);
 
 const state = reactive({
@@ -70,7 +73,7 @@ export default function () {
                 state.userData.role = _data.role;
                 state.userData.uid = _data.uid;
                 console.log("AuthCheck");
-                startAllListerners().then(() => {
+                startAllListeners().then(() => {
                   console.log(courses);
                   resolve(true);
                 })
@@ -93,14 +96,26 @@ export default function () {
   };
 }
 
-export const loadCourses = () => {
-  console.log('Subscription happening');
+export const loadAllCourses = () => {
+  console.log('Courses listener started');
   return new Promise((resolve) => {
     const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
       courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       resolve(true);
     })
-    subscribers.push(coursesSubscriber);
+    subscribers.value.push(coursesSubscriber);
+    return courses
+  })
+}
+
+export const loadMyCourses = () => {
+  console.log('Courses listener started');
+  return new Promise((resolve) => {
+    const coursesSubscriber = courseCollection.where("editors", "array-contains", state.userData.uid).onSnapshot(snapshot => {
+      courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(coursesSubscriber);
     return courses
   })
 }
@@ -119,20 +134,52 @@ export const getCourse = (id) => {
 }
 
 export const loadUsers = () => {
-  console.log('Subscription happening');
+  console.log('Users listener started');
   return new Promise((resolve) => {
     const usersSubscriber = userCollection.onSnapshot(snapshot => {
       users.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       resolve(true);
     })
-    subscribers.push(usersSubscriber);
+    subscribers.value.push(usersSubscriber);
     return users
   })
 }
 
-// Erlaubt Komponenten den Zugriff auf
 export const getUsers = () => {
   return users
+}
+
+export const loadUnassignedEditors = (course) => {
+  return new Promise((resolve) => {
+    const unassignedEditorsQuery = userCollection.where("role", "==", "editor").onSnapshot(querySnapshot => {
+      const editors = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      unassignedEditors.value = editors.filter((item) => {
+        return !item.courses.includes(course);
+      });
+      resolve(true);
+    })
+    courseSubscribers.value.push(unassignedEditorsQuery);
+    return unassignedEditors;
+  })
+}
+
+export const loadAssignedEditors = (course) => {
+  return new Promise((resolve) => {
+    const assignedEditorsQuery = userCollection.where("courses", "array-contains", course).onSnapshot(querySnapshot => {
+      assignedEditors.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    courseSubscribers.value.push(assignedEditorsQuery);
+    return assignedEditors
+  })
+}
+
+export const getAssignedEditors = () => {
+  return assignedEditors;
+}
+
+export const getUnassignedEditors = () => {
+  return unassignedEditors
 }
 
 export const getUser = (id) => {
@@ -144,7 +191,7 @@ export const getUser = (id) => {
   return user[0];
 }
 
-// Nutzer bearbeiten
+// Edit user
 export const updateUser = (doc, role) => {
   return new Promise((resolve, reject) => {
     userCollection.doc(doc).update({
@@ -158,7 +205,7 @@ export const updateUser = (doc, role) => {
   })
 }
 
-// Kurs erstellen
+// Create course
 export const createCourse = (id, courseName) => {
   return new Promise((resolve, reject) => {
     // Create array with found duplicates
@@ -186,7 +233,7 @@ export const createCourse = (id, courseName) => {
   })
 }
 
-// Kurs bearbeiten
+// Edit course
 export const updateCourse = (doc, courseId, courseName) => {
   return new Promise((resolve, reject) => {
     courseCollection.doc(doc).update({
@@ -201,7 +248,7 @@ export const updateCourse = (doc, courseId, courseName) => {
   })
 }
 
-// Kurs löschen
+// Delete course
 export const deleteCourse = (doc) => {
   return new Promise((resolve, reject) => {
     courseCollection.doc(doc).delete().then(() => {
@@ -214,13 +261,56 @@ export const deleteCourse = (doc) => {
   })
 }
 
-export const startAllListerners = () => {
-  return new Promise((resolve) => {
-    loadUsers();
-    loadCourses().then(() => {
-      resolve(true);
-    })
+// Assign user as an editor for selected course
+export const assignEditor = async (uid, course, courseId) => {
+  await userCollection.doc(uid).update({
+    courses: firebase.firestore.FieldValue.arrayUnion(courseId)
+  }).catch((error) => {
+    alert(error);
   })
+  await courseCollection.doc(course).update({
+    editors: firebase.firestore.FieldValue.arrayUnion(uid)
+  }).catch((error) => {
+    alert(error);
+  })
+  console.log("Editor assigned");
+}
+
+// Unassign user as an editor for selected course
+export const unassignEditor = async (uid, course, courseId) => {
+  await userCollection.doc(uid).update({
+    courses: firebase.firestore.FieldValue.arrayRemove(courseId)
+  }).catch((error) => {
+    alert(error);
+  })
+  await courseCollection.doc(course).update({
+    editors: firebase.firestore.FieldValue.arrayRemove(uid)
+  }).catch((error) => {
+    alert(error);
+  })
+  console.log("Editor unassigned");
+}
+
+export const startAllListeners = async () => {
+  await loadUsers();
+  if (state.userData.role === 'admin') {
+    await loadAllCourses();
+  }
+  else if (state.userData.role === 'editor') {
+    await loadMyCourses();
+  }
+}
+
+export const startCourseListeners = (course) => {
+  console.log('Course listeners started');
+  loadAssignedEditors(course)
+  loadUnassignedEditors(course);
+}
+
+export const stopCourseListeners = () => {
+  courseSubscribers.value.forEach(subscriber => subscriber());
+  courseSubscribers.value = [];
+  console.log('Course listeners stopped');
 }
 
 export const disableBackButton = () => {
@@ -237,8 +327,8 @@ export const getbackButtonState = () => {
 
 export const unsubscribeAllListeners = () => {
   // called by auth.js on user signout to unsubscribe all firestore realtime listeners
-  console.log(subscribers);
-  console.log('Unsubscribing all realtime listeners');
-  subscribers.forEach(subscriber => subscriber());
+  subscribers.value.forEach(subscriber => subscriber());
+  subscribers.value = [];
+  console.log('Stopped all realtime listeners');
 }
 

@@ -40,12 +40,12 @@
               <p class="control">
                 <router-link
                   class="button is-primary is-fullwidth"
-                  to="/course-overview"
+                  to="/my-courses"
                 >
                   <span class="icon is-small">
                     <i class="fas fa-arrow-right"></i>
                   </span>
-                  <span>Kursübersicht</span>
+                  <span>Meine Kurse</span>
                 </router-link>
               </p>
             </div>

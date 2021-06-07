@@ -92,7 +92,7 @@
         </div>
       </div>
       <hr class="mb-0" />
-      <p class="panel-tabs">
+      <p class="panel-tabs" v-if="user.role === 'admin'">
         <a class="is-active">Alle</a>
         <a>Studenten</a>
         <a>Ticketbearbeiter</a>
@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import { getUsers } from "../store/firebase";
+import { getUsers } from "../../store/firebase";
 import { useRouter } from "vue-router";
 export default {
   setup() {

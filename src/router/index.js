@@ -31,7 +31,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (tickets.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "tickets" */ '../views/CourseCreation.vue'),
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseCreation.vue'),
     meta: {
       requiresAuth: true
     }
@@ -42,7 +42,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (tickets.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "tickets" */ '../views/UserOverview.vue'),
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/UserOverview.vue'),
     meta: {
       requiresAuth: true
     }
@@ -53,7 +53,29 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (tickets.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "tickets" */ '../views/CourseOverview.vue'),
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseOverview.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/my-courses',
+    name: 'MyCourses',
+    // route level code-splitting
+    // this generates a separate chunk (tickets.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/editor/MyCourses.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/course-editors/:id',
+    name: 'CourseEditors',
+    // route level code-splitting
+    // this generates a separate chunk (tickets.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseEditors.vue'),
     meta: {
       requiresAuth: true
     }
@@ -75,7 +97,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (tickets.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "tickets" */ '../views/CourseAdministration.vue'),
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseAdministration.vue'),
     meta: {
       requiresAuth: true
     }
@@ -86,7 +108,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (tickets.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "tickets" */ '../views/UserAdministration.vue'),
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/UserAdministration.vue'),
     meta: {
       requiresAuth: true
     }
@@ -97,7 +119,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (tickets.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "tickets" */ '../views/TicketCreation.vue'),
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/student/TicketCreation.vue'),
     meta: {
       requiresAuth: true
     }

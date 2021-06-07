@@ -60,7 +60,7 @@
         </div>
       </div>
       <hr class="mb-0" />
-      <p class="panel-tabs">
+      <p class="panel-tabs" v-if="userData.role === 'admin'">
         <a class="is-active">Aktiv</a>
         <a>Ohne Bearbeiter</a>
         <a>Deaktiviert</a>
@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import useFirebase, { getCourses } from "../store/firebase";
+import useFirebase, { getCourses } from "../../store/firebase";
 import { useRouter } from "vue-router";
 export default {
   setup() {

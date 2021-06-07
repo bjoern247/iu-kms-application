@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import { getUser, updateUser } from "../store/firebase";
+import { getUser, updateUser } from "../../store/firebase";
 import { useRouter } from "vue-router";
 import { ref } from 'vue';
 export default {
