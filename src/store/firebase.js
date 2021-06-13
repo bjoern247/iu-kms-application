@@ -18,9 +18,11 @@ const db = firebase.firestore();
 // const usersCollection = db.collection('users');
 const courseCollection = db.collection('courses');
 const userCollection = db.collection('users');
+const ticketCollection = db.collection('tickets');
 const subscribers = ref([]);
 const courseSubscribers = ref([]);
 const courses = ref([]);
+const tickets = ref([]);
 const users = ref([]);
 const unassignedEditors = ref([]);
 const assignedEditors = ref([]);
@@ -96,6 +98,7 @@ export default function () {
   };
 }
 
+// Admin
 export const loadAllCourses = () => {
   console.log('Courses listener started');
   return new Promise((resolve) => {
@@ -108,6 +111,19 @@ export const loadAllCourses = () => {
   })
 }
 
+// Student (only for ticket-creation)
+export const loadAllCourseIds = () => {
+  return new Promise((resolve) => {
+    const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
+      courses.value = snapshot.docs.map(doc => ({ id: doc.id, courseId: doc.data().courseId }))
+      resolve(true);
+    })
+    subscribers.value.push(coursesSubscriber);
+    return courses
+  })
+}
+
+// Editor
 export const loadMyCourses = () => {
   console.log('Courses listener started');
   return new Promise((resolve) => {
@@ -123,6 +139,80 @@ export const loadMyCourses = () => {
 export const getCourses = () => {
   console.log(courses);
   return courses
+}
+
+// Admin
+export const loadAllTickets = () => {
+  console.log('Ticket listener started');
+  return new Promise((resolve) => {
+    const ticketsSubscriber = ticketCollection.onSnapshot(snapshot => {
+      tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(ticketsSubscriber);
+    return tickets
+  })
+}
+
+// Editor
+export const loadAssignedTickets = async () => {
+  const courses = await getAssignedCourses();
+  if (courses.length != 0) {
+    console.log('Ticket listener started');
+    return new Promise((resolve) => {
+      const ticketsSubscriber = ticketCollection.where("courseId", "in", courses).onSnapshot(snapshot => {
+        tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        resolve(true);
+      })
+      subscribers.value.push(ticketsSubscriber);
+      return tickets
+    })
+  }
+}
+
+// Returns assigned courses for editors
+export const getAssignedCourses = () => {
+  console.log("getting assigned courses");
+  return new Promise((resolve) => {
+    userCollection.doc(state.userData.uid).get().then((doc) => {
+      console.log(doc.data().courses);
+      resolve(doc.data().courses);
+    });
+  })
+}
+
+export const loadCreatedTickets = () => {
+  console.log('Ticket listener started');
+  return new Promise((resolve) => {
+    const ticketsSubscriber = ticketCollection.where("createdBy", "==", state.userData.uid).onSnapshot(snapshot => {
+      tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(ticketsSubscriber);
+    return tickets
+  })
+}
+
+export const getTickets = () => {
+  console.log(tickets);
+  return tickets
+}
+
+export const getCourseDocById = (courseId) => {
+  console.log(courseId);
+  return new Promise((resolve, reject) => {
+    courseCollection.where("courseId", "==", courseId).get().then((querySnapshot) => {
+      let docId = 'none'
+      querySnapshot.forEach((doc) => {
+        docId = doc.id;
+      });
+      console.log(docId);
+      resolve(docId);
+    }).catch((error) => {
+      console.log("Error getting documents: ", error);
+      reject();
+  });
+  })
 }
 
 export const getCourse = (id) => {
@@ -198,6 +288,28 @@ export const updateUser = (doc, role) => {
       role: role
     }).then(() => {
       resolve(true);
+    }).catch((error) => {
+      alert(error);
+      reject();
+    });
+  })
+}
+
+// Create Ticket
+export const createTicket = async (name, text, category, courseId) => {
+  const docId = await getCourseDocById(courseId);
+  console.log(docId);
+  return new Promise((resolve, reject) => {
+    ticketCollection.doc().set({
+      ticketName: name,
+      ticketText: text,
+      ticketCategory: category,
+      courseDocId: docId,
+      courseId: courseId,
+      datetime: new Date(),
+      createdBy: state.userData.uid
+    }).then(() => {
+      resolve();
     }).catch((error) => {
       alert(error);
       reject();
@@ -295,9 +407,15 @@ export const startAllListeners = async () => {
   await loadUsers();
   if (state.userData.role === 'admin') {
     await loadAllCourses();
+    await loadAllTickets();
   }
   else if (state.userData.role === 'editor') {
     await loadMyCourses();
+    await loadAssignedTickets();
+  }
+  else if (state.userData.role === 'student') {
+    await loadAllCourseIds();
+    await loadCreatedTickets();
   }
 }
 
