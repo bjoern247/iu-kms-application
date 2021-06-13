@@ -81,6 +81,17 @@ const routes = [
     }
   },
   {
+    path: '/ticket-detail-view/:id',
+    name: 'TicketDetailView',
+    // route level code-splitting
+    // this generates a separate chunk (tickets.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "tickets" */ '../views/TicketDetailView.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/course-detail-view/:id',
     name: 'CourseDetailView',
     // route level code-splitting
