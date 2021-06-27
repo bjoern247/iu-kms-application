@@ -5,7 +5,7 @@
     >
       <div class="box">
         <p class="title">Tickets</p>
-        <p class="subtitle">Neu <span class="tag is-rounded is-danger">0</span> Offen <span class="tag is-rounded is-warning">0</span> Rückfrage <span class="tag is-rounded is-success">0</span></p>
+        <p class="subtitle">Neu <span class="tag is-rounded is-danger">0</span> In Bearbeitung <span class="tag is-rounded is-warning">0</span></p>
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">

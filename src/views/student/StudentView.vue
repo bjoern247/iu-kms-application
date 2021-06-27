@@ -6,9 +6,8 @@
       <div class="box">
         <p class="title">Tickets</p>
         <p class="subtitle">
-          Erstellt <span class="tag is-rounded is-dark">0</span> Rückfrage
-          <span class="tag is-rounded is-danger">0</span> Erledigt
-          <span class="tag is-rounded is-success">0</span>
+          Erstellt <span class="tag is-rounded is-dark">{{tickets.length}}</span>
+          Erledigt <span class="tag is-rounded is-success">0</span>
         </p>
         <div class="field is-horizontal">
           <div class="field-body">
@@ -68,16 +67,18 @@
 </template>
 
 <script>
-import useFirebaseAuth from "../../store/firebase";
+import useFirebaseAuth, { getTickets } from "../../store/firebase";
 export default {
   name: "StudentView",
   setup() {
     const state = useFirebaseAuth();
     const { logout } = useFirebaseAuth();
+    const tickets = getTickets();
     const userData = state.userData.value;
     return {
       userData,
       logout,
+      tickets
     };
   },
 };

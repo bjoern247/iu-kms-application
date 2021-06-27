@@ -76,7 +76,7 @@
       <div class="box">
         <p class="title">Tickets</p>
         <p class="subtitle">
-          <span>Gesamt</span> <span class="tag is-rounded is-dark">0</span>
+          <span>Gesamt</span> <span class="tag is-rounded is-dark">{{tickets.length}}</span>
         </p>
         <div class="field is-horizontal">
           <div class="field-body">
@@ -122,12 +122,13 @@
   </div>
 </template>
 <script>
-import useFirebaseAuth, { getCourses, getUsers } from "../../store/firebase";
+import useFirebaseAuth, { getCourses, getUsers, getTickets } from "../../store/firebase";
 export default {
   name: "AdminView",
   setup() {
     const state = useFirebaseAuth();
     const courses = getCourses();
+    const tickets = getTickets();
     const users = getUsers();
     const { logout } = useFirebaseAuth();
     const userData = state.userData.value;
@@ -135,7 +136,8 @@ export default {
       userData,
       logout,
       courses,
-      users
+      users,
+      tickets
     };
   },
 };
