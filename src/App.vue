@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import useFirebaseAuth, { getbackButtonState, stopCourseListeners } from "./store/firebase";
+import useFirebaseAuth, { getbackButtonState } from "./store/firebase";
 import { useRouter } from "vue-router";
 export default {
   setup() {
@@ -110,7 +110,6 @@ export default {
       router.back();
     }
     function goHome() {
-      stopCourseListeners();
       router.push('/');
     }
     return {
