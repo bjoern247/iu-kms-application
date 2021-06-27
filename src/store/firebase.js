@@ -14,20 +14,23 @@ const config = {
 };
 firebase.initializeApp(config);
 
+
+// Variables
 const db = firebase.firestore();
-// const usersCollection = db.collection('users');
 const courseCollection = db.collection('courses');
 const userCollection = db.collection('users');
 const ticketCollection = db.collection('tickets');
 const subscribers = ref([]);
-const courseSubscribers = ref([]);
+const collectionListeners = ref([]);
+const ticketSubscribers = ref ([]);
 const courses = ref([]);
 const tickets = ref([]);
+const ticket = ref();
 const users = ref([]);
 const unassignedEditors = ref([]);
 const assignedEditors = ref([]);
 const backButtonDisabled = ref(false);
-
+// User State Object
 const state = reactive({
   user: null,
   initialized: false,
@@ -36,14 +39,15 @@ const state = reactive({
     displayName: null,
     email: true,
     role: null,
-    uid: null
+    uid: null,
+    appLoaded: false
   })
 });
 
+// AUTHENTICATION STATE MANAGEMT
 export default function () {
   const router = useRouter();
   const logout = () => {
-
     firebase
       .auth()
       .signOut()
@@ -52,6 +56,11 @@ export default function () {
         state.user = null;
         state.initialized = false;
         state.error = null;
+        state.userData.appLoaded = false;
+        state.userData.displayName = null;
+        state.userData.role = null;
+        state.userData.uid = null;
+        state.userData.email = null;
         router.push("/login");
         unsubscribeAllListeners();
       })
@@ -77,6 +86,7 @@ export default function () {
                 console.log("AuthCheck");
                 startAllListeners().then(() => {
                   console.log(courses);
+                  state.userData.appLoaded = true;
                   resolve(true);
                 })
               });
@@ -98,50 +108,61 @@ export default function () {
   };
 }
 
-// Admin
-export const loadAllCourses = () => {
-  console.log('Courses listener started');
+/*
+USER
+*/
+
+// Admin: Load all users from firestore
+export const loadUsers = () => {
+  console.log('Users listener started');
   return new Promise((resolve) => {
-    const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
-      courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    const usersSubscriber = userCollection.onSnapshot(snapshot => {
+      users.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       resolve(true);
     })
-    subscribers.value.push(coursesSubscriber);
-    return courses
+    subscribers.value.push(usersSubscriber);
+    return users
   })
 }
 
-// Student (only for ticket-creation)
-export const loadAllCourseIds = () => {
-  return new Promise((resolve) => {
-    const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
-      courses.value = snapshot.docs.map(doc => ({ id: doc.id, courseId: doc.data().courseId }))
+// GET-Method for component
+export const getUsers = () => {
+  return users
+}
+
+// GET-Method for component
+export const getUser = (id) => {
+  console.log(id);
+  const user = users.value.filter((item) => {
+    return item.uid === id
+  })
+  console.log(user[0]);
+  return user[0];
+}
+
+export const getUserData = () => {
+  return state.userData;
+}
+
+// Admin: Edit role of user
+export const updateUser = (doc, role) => {
+  return new Promise((resolve, reject) => {
+    userCollection.doc(doc).update({
+      role: role
+    }).then(() => {
       resolve(true);
-    })
-    subscribers.value.push(coursesSubscriber);
-    return courses
+    }).catch((error) => {
+      alert(error);
+      reject();
+    });
   })
 }
 
-// Editor
-export const loadMyCourses = () => {
-  console.log('Courses listener started');
-  return new Promise((resolve) => {
-    const coursesSubscriber = courseCollection.where("editors", "array-contains", state.userData.uid).onSnapshot(snapshot => {
-      courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-      resolve(true);
-    })
-    subscribers.value.push(coursesSubscriber);
-    return courses
-  })
-}
+/*
+TICKETS
+*/
 
-export const getCourses = () => {
-  console.log(courses);
-  return courses
-}
-
-// Admin
+// Admin: Loads all tickets into tickets variable
 export const loadAllTickets = () => {
   console.log('Ticket listener started');
   return new Promise((resolve) => {
@@ -154,50 +175,72 @@ export const loadAllTickets = () => {
   })
 }
 
-// Editor
+// Editor: loads all tickets that are created in assigned courses
 export const loadAssignedTickets = async () => {
-  const courses = await getAssignedCourses();
+  const courses = await getAssignedCourses(); // Editor's assigned courses
   if (courses.length != 0) {
-    console.log('Ticket listener started');
+    console.log('Ticket Collection listener started');
     return new Promise((resolve) => {
       const ticketsSubscriber = ticketCollection.where("courseId", "in", courses).onSnapshot(snapshot => {
         tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
         resolve(true);
-      })
+      }) // Query for all tickets in courses that Editor has assigned to himself
       subscribers.value.push(ticketsSubscriber);
       return tickets
     })
   }
 }
 
-// Returns assigned courses for editors
-export const getAssignedCourses = () => {
-  console.log("getting assigned courses");
-  return new Promise((resolve) => {
-    userCollection.doc(state.userData.uid).get().then((doc) => {
-      console.log(doc.data().courses);
-      resolve(doc.data().courses);
-    });
-  })
-}
-
+// Student: Load all tickets created by user
 export const loadCreatedTickets = () => {
-  console.log('Ticket listener started');
+  console.log('Ticket collection listener started');
   return new Promise((resolve) => {
     const ticketsSubscriber = ticketCollection.where("createdBy", "==", state.userData.uid).onSnapshot(snapshot => {
       tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       resolve(true);
-    })
+    }) // Query for all tickets created by specified user
     subscribers.value.push(ticketsSubscriber);
     return tickets
   })
 }
 
+export const loadTicket = async (id) => {
+  console.log("Specific Ticket listener started()");
+  return new Promise((resolve) => {
+    const ticketSubscriber = ticketCollection.doc(id).onSnapshot(doc => {
+      ticket.value = doc.data();
+      resolve(doc.data());
+      console.log(ticket.value);
+    })
+    ticketSubscribers.value.push(ticketSubscriber);
+    return ticket
+  })
+}
+
+// GET-Method for component access
+export const getTicket = () => {
+  return ticket;
+}
+
+// GET-Method for component access
 export const getTickets = () => {
   console.log(tickets);
   return tickets
 }
 
+// Load Course-IDs for ticket creation (Dropdown: Select Course)
+export const loadAllCourseIds = () => {
+  return new Promise((resolve) => {
+    const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
+      courses.value = snapshot.docs.map(doc => ({ id: doc.id, courseId: doc.data().courseId }))
+      resolve(true);
+    })
+    subscribers.value.push(coursesSubscriber);
+    return courses
+  })
+}
+
+// Helper Method to write course document id into newly created tickets
 export const getCourseDocById = (courseId) => {
   console.log(courseId);
   return new Promise((resolve, reject) => {
@@ -215,30 +258,107 @@ export const getCourseDocById = (courseId) => {
   })
 }
 
+// Create ticket
+export const createTicket = async (name, text, category, courseId) => {
+  const docId = await getCourseDocById(courseId);
+  console.log(docId);
+  return new Promise((resolve, reject) => {
+    let newTicketRef = ticketCollection.doc();
+    newTicketRef.set({
+      ticketName: name,
+      ticketText: text,
+      ticketCategory: category,
+      ticketId: newTicketRef.id,
+      ticketStatus: 'created',
+      courseDocId: docId,
+      courseId: courseId,
+      datetime: new Date(),
+      createdBy: state.userData.uid,
+      creatorMail: state.userData.email
+    }).then(() => {
+      console.log("Ticket sucessfully created")
+      resolve();
+    }).catch((error) => {
+      alert(error);
+      reject();
+    });
+  })
+}
+
+// Delete ticket
+export const deleteTicket = (id) => {
+  return new Promise((resolve, reject) => {
+    ticketCollection.doc(id).delete().then(() => {
+      resolve(true);
+      disableBackButton();
+    }).catch((error) => {
+      alert(error);
+      reject(error);
+    })
+  })
+}
+
+/* 
+COURSES
+*/
+
+// Admin: Load all courses from firestore
+export const loadAllCourses = () => {
+  console.log('Courses listener started');
+  return new Promise((resolve) => {
+    const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
+      courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(coursesSubscriber);
+    return courses
+  })
+}
+
+// Editor: Load all assigned courses from firestore
+export const loadMyCourses = () => {
+  console.log('Courses listener started');
+  return new Promise((resolve) => {
+    const coursesSubscriber = courseCollection.where("editors", "array-contains", state.userData.uid).onSnapshot(snapshot => {
+      courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    }) // Query for courses where editors' array contains currently authenticated user's uid
+    subscribers.value.push(coursesSubscriber);
+    return courses
+  })
+}
+
+// GET-Method for component
+export const getCourses = () => {
+  return courses
+}
+
+
+
+// Returns assigned courses for editors
+export const getAssignedCourses = () => {
+  console.log("getting assigned courses");
+  return new Promise((resolve) => {
+    userCollection.doc(state.userData.uid).get().then((doc) => {
+      console.log(doc.data().courses);
+      resolve(doc.data().courses);
+    });
+  })
+}
+
 export const getCourse = (id) => {
-  console.log(id);
+  // realtime updates not needed here (ticket is different)
+  console.log("getCourse()");
+  console.log(courses.value);
   const course = courses.value.filter((item) => {
     return item.id === id
   })
   return course[0];
 }
 
-export const loadUsers = () => {
-  console.log('Users listener started');
-  return new Promise((resolve) => {
-    const usersSubscriber = userCollection.onSnapshot(snapshot => {
-      users.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-      resolve(true);
-    })
-    subscribers.value.push(usersSubscriber);
-    return users
-  })
-}
 
-export const getUsers = () => {
-  return users
-}
 
+// Returns all editors that are not assigned to specified course
 export const loadUnassignedEditors = (course) => {
   return new Promise((resolve) => {
     const unassignedEditorsQuery = userCollection.where("role", "==", "editor").onSnapshot(querySnapshot => {
@@ -248,73 +368,31 @@ export const loadUnassignedEditors = (course) => {
       });
       resolve(true);
     })
-    courseSubscribers.value.push(unassignedEditorsQuery);
+    collectionListeners.value.push(unassignedEditorsQuery);
     return unassignedEditors;
   })
 }
 
+// Returns assigned editors for specified course
 export const loadAssignedEditors = (course) => {
   return new Promise((resolve) => {
     const assignedEditorsQuery = userCollection.where("courses", "array-contains", course).onSnapshot(querySnapshot => {
       assignedEditors.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       resolve(true);
     })
-    courseSubscribers.value.push(assignedEditorsQuery);
+    collectionListeners.value.push(assignedEditorsQuery);
     return assignedEditors
   })
 }
 
+// GET-Method for component
 export const getAssignedEditors = () => {
   return assignedEditors;
 }
 
+// GET-Method for component
 export const getUnassignedEditors = () => {
   return unassignedEditors
-}
-
-export const getUser = (id) => {
-  console.log(id);
-  const user = users.value.filter((item) => {
-    return item.uid === id
-  })
-  console.log(user[0]);
-  return user[0];
-}
-
-// Edit user
-export const updateUser = (doc, role) => {
-  return new Promise((resolve, reject) => {
-    userCollection.doc(doc).update({
-      role: role
-    }).then(() => {
-      resolve(true);
-    }).catch((error) => {
-      alert(error);
-      reject();
-    });
-  })
-}
-
-// Create Ticket
-export const createTicket = async (name, text, category, courseId) => {
-  const docId = await getCourseDocById(courseId);
-  console.log(docId);
-  return new Promise((resolve, reject) => {
-    ticketCollection.doc().set({
-      ticketName: name,
-      ticketText: text,
-      ticketCategory: category,
-      courseDocId: docId,
-      courseId: courseId,
-      datetime: new Date(),
-      createdBy: state.userData.uid
-    }).then(() => {
-      resolve();
-    }).catch((error) => {
-      alert(error);
-      reject();
-    });
-  })
 }
 
 // Create course
@@ -345,7 +423,7 @@ export const createCourse = (id, courseName) => {
   })
 }
 
-// Edit course
+// Edit course details
 export const updateCourse = (doc, courseId, courseName) => {
   return new Promise((resolve, reject) => {
     courseCollection.doc(doc).update({
@@ -373,7 +451,7 @@ export const deleteCourse = (doc) => {
   })
 }
 
-// Assign user as an editor for selected course
+// Assign user as an editor for specified course
 export const assignEditor = async (uid, course, courseId) => {
   await userCollection.doc(uid).update({
     courses: firebase.firestore.FieldValue.arrayUnion(courseId)
@@ -388,7 +466,7 @@ export const assignEditor = async (uid, course, courseId) => {
   console.log("Editor assigned");
 }
 
-// Unassign user as an editor for selected course
+// Unassign user as an editor for specified course
 export const unassignEditor = async (uid, course, courseId) => {
   await userCollection.doc(uid).update({
     courses: firebase.firestore.FieldValue.arrayRemove(courseId)
@@ -403,6 +481,12 @@ export const unassignEditor = async (uid, course, courseId) => {
   console.log("Editor unassigned");
 }
 
+
+/*
+LISTENER MANAGEMENT
+*/
+
+// Role based loading
 export const startAllListeners = async () => {
   await loadUsers();
   if (state.userData.role === 'admin') {
@@ -419,16 +503,25 @@ export const startAllListeners = async () => {
   }
 }
 
+// Attaching listeners 
 export const startCourseListeners = (course) => {
   console.log('Course listeners started');
   loadAssignedEditors(course)
   loadUnassignedEditors(course);
 }
 
+// Detaching listeners when no longer needed to save operations
 export const stopCourseListeners = () => {
-  courseSubscribers.value.forEach(subscriber => subscriber());
-  courseSubscribers.value = [];
+  collectionListeners.value.forEach(subscriber => subscriber());
+  collectionListeners.value = [];
   console.log('Course listeners stopped');
+}
+
+// For detaching specific realtime ticket listener
+export const stopTicketListener = () => {
+  ticketSubscribers.value.forEach(subscriber => subscriber());
+  ticketSubscribers.value = [];
+  console.log('Specific ticket listener stopped');
 }
 
 export const disableBackButton = () => {
@@ -439,10 +532,12 @@ export const enableBackButton = () => {
   backButtonDisabled.value = false;
 }
 
+// GET-Method for App.vue component to recieve state
 export const getbackButtonState = () => {
   return backButtonDisabled;
 }
 
+// Detach all realtime listeners, for example when logging user out
 export const unsubscribeAllListeners = () => {
   // called by auth.js on user signout to unsubscribe all firestore realtime listeners
   subscribers.value.forEach(subscriber => subscriber());
