@@ -75,8 +75,10 @@ import {
   getCourse,
   startCourseListeners,
   getAssignedEditors,
-} from "../store/firebase";
+  stopCourseListeners,
+} from "../../store/firebase";
 import { useRouter } from "vue-router";
+import { onUnmounted } from "@vue/runtime-core";
 export default {
   setup() {
     const router = useRouter();
@@ -90,10 +92,13 @@ export default {
         return name;
       }
     };
+    onUnmounted(() => {
+      stopCourseListeners();
+    });
     return {
       course,
       assignedEditors,
-      nameWithComma
+      nameWithComma,
     };
   },
 };
