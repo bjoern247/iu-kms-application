@@ -112,8 +112,9 @@ import {
   deleteCourse,
   getAssignedEditors,
   startCourseListeners,
+  stopCourseListeners,
 } from "../../store/firebase";
-import { ref } from "vue";
+import { onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 export default {
   setup() {
@@ -169,6 +170,9 @@ export default {
         return name;
       }
     };
+    onUnmounted(() => {
+      stopCourseListeners();
+    })
     return {
       deleteOperationLoading,
       saveOperationLoading,

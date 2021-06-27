@@ -17,7 +17,7 @@
         <div
           class="
             column
-            is-5-desktop is-5-tablet is-5-widescreen is-4-fullhd is-5-mobile
+            is-4-desktop is-3-tablet is-3-widescreen is-4-fullhd is-3-mobile
           "
         >
           Beschreibung
@@ -25,7 +25,7 @@
         <div
           class="
             column
-            is-2-desktop is-2-tablet is-2-widescreen is-3-fullhd is-2-mobile
+            is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile
           "
         >
           Kurs
@@ -33,7 +33,15 @@
         <div
           class="
             column
-            is-3-desktop is-3-tablet is-3-widescreen is-3-fullhd is-2-mobile
+            is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-3-mobile
+          "
+        >
+          Status
+        </div>
+        <div
+          class="
+            column
+            is-2-desktop is-3-tablet is-3-widescreen is-2-fullhd is-2-mobile
           "
         >
           Datum & Zeit
@@ -41,7 +49,7 @@
         <div
           class="
             column
-            is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-3-mobile
+            is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile
             has-text-right
           "
         ></div>
@@ -59,7 +67,7 @@
             "
             class="
               column
-              is-5-desktop is-5-tablet is-5-widescreen is-4-fullhd is-5-mobile
+              is-4-desktop is-3-tablet is-3-widescreen is-4-fullhd is-3-mobile
             "
           >
             <span>{{ ticket.ticketName }}</span>
@@ -67,20 +75,37 @@
           <div
             class="
               column
-              is-2-desktop is-2-tablet is-2-widescreen is-3-fullhd is-2-mobile
-            "
-            style="
-              overflow: hidden;
-              white-space: nowrap;
-              text-overflow: ellipsis;
+              is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile
             "
           >
-            <span>{{ ticket.courseId }} </span>
+            <span class="tag is-medium is-dark">{{ ticket.courseId }} </span>
           </div>
+          <div
+          class="
+            column
+            is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-3-mobile
+          "
+        >
+          <span
+                  v-if="ticket.ticketStatus === 'created'"
+                  class="tag is-medium is-dark"
+                  >In Prüfung</span
+                >
+                <span
+                  v-else-if="ticket.ticketStatus === 'validated'"
+                  class="tag is-medium is-success"
+                  >In Bearbeitung</span
+                >
+                <span
+                  v-else-if="ticket.ticketStatus === 'closed'"
+                  class="tag is-medium is-danger"
+                  >Abgeschlossen</span
+                >
+        </div>
           <div
             class="
               column
-              is-3-desktop is-3-tablet is-3-widescreen is-3-fullhd is-3-mobile
+              is-2-desktop is-3-tablet is-3-widescreen is-2-fullhd is-2-mobile
             "
             style="
               overflow: hidden;
@@ -110,6 +135,7 @@
             </div>
           </div>
         </div>
+        <hr class="m-0">
       </div>
       <hr class="mb-0" />
     </div>

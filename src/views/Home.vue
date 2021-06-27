@@ -1,16 +1,19 @@
 <template>
-  <div class="home">
+  <div v-if="userData.appLoaded" class="home">
     <StudentView v-if="userData.role === 'student'" />
     <EditorView v-else-if="userData.role === 'editor'" />
     <AdminView v-else-if="userData.role === 'admin'" />
   </div>
+  <div v-else class="box has-text-centered">
+    <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  </div>
 </template>
 
 <script>
-import useFirebase from "../store/firebase";
 import StudentView from "./student/StudentView";
 import EditorView from "./editor/EditorView";
 import AdminView from "./admin/AdminView";
+import { getUserData } from "../store/firebase";
 export default {
   components: {
     StudentView,
@@ -18,10 +21,9 @@ export default {
     AdminView,
   },
   setup() {
-    const state = useFirebase();
-    const userData = state.userData.value;
+    const userData = getUserData();
     return {
-      userData
+      userData,
     };
   },
 };

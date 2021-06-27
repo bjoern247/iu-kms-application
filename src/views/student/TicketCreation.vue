@@ -108,7 +108,7 @@ export default {
           form.ticketText = "";
           form.ticketCategory = "Skript";
           loading.value = false;
-          router.push("/");
+          router.push("/ticket-overview");
         },
         () => {
           loading.value = false;

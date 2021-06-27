@@ -9,7 +9,7 @@
         </span>
       </p>
     </div>
-    <div class="box p-0 pb-">
+    <div class="box p-0">
       <div v-for="course in courses" :key="course.id" class="row">
         <div class="columns is-mobile is-centered is-vcentered mt-2 pr-4 pl-4">
           <div
@@ -54,11 +54,6 @@
         </div>
       </div>
       <hr class="mb-0" />
-      <p class="panel-tabs" v-if="userData.role === 'admin'">
-        <a class="is-active">Aktiv</a>
-        <a>Ohne Bearbeiter</a>
-        <a>Deaktiviert</a>
-      </p>
     </div>
   </nav>
 </template>
