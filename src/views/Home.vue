@@ -4,8 +4,21 @@
     <EditorView v-else-if="userData.role === 'editor'" />
     <AdminView v-else-if="userData.role === 'admin'" />
   </div>
-  <div v-else class="box has-text-centered">
-    <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  <div v-else class="columns">
+    <div class="column is-12">
+      <div class="box has-text-centered">
+        <div class="lds-roller">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

@@ -1,6 +1,7 @@
 <template>
   <div class="box" v-if="loaded">
     <p class="title">Ticketinformationen</p>
+    <p class="subtitle" v-if="ticket.ticketStatus === 'created'">Prüfung ausstehend, Bearbeitung erst nach Prüfung möglich</p>
     <form>
       <div class="columns">
         <div class="column is-8">
@@ -116,6 +117,7 @@
               </div>
             </div>
           </fieldset>
+          <!-- Administrator -->
           <div class="field mt-2" v-if="userData.role === 'admin'">
             <label class="label">Administrator-Operationen</label>
             <div class="control">
@@ -130,6 +132,25 @@
                     <i class="fas fa-trash-alt"></i>
                   </span>
                   <span>Löschen</span>
+                </button>
+              </legend>
+            </div>
+          </div>
+          <!-- Editor -->
+          <div class="field mt-2" v-if="userData.role === 'editor' && ticketStatus === 'created'">
+            <label class="label">Bearbeiter-Optionen</label>
+            <div class="control">
+              <legend>
+                <button
+                  class="button is-success"
+                  :class="{ 'is-loading': deleteOperationLoading }"
+                  type="button"
+                  @click="submitValidation()"
+                >
+                  <span class="icon is-small">
+                    <i class="fas fa-clipboard-check"></i>
+                  </span>
+                  <span>Geprüft</span>
                 </button>
               </legend>
             </div>
@@ -150,6 +171,7 @@ import {
   getUserData,
   loadTicket,
   deleteTicket,
+  validateTicket,
   stopTicketListener,
 } from "../store/firebase";
 import { useRouter } from "vue-router";
@@ -161,7 +183,8 @@ export default {
     const loaded = ref(false);
     const userData = getUserData();
     const deleteOperationLoading = ref(false);
-    loadTicket(router.currentRoute.value.params.id).then(() => {
+    const ticketId = router.currentRoute.value.params.id;
+    loadTicket(ticketId).then(() => {
       loaded.value = true;
     });
     const ticket = getTicket();
@@ -175,7 +198,7 @@ export default {
       );
       if (result) {
         router.push("/ticket-overview");
-        await deleteTicket(router.currentRoute.value.params.id)
+        await deleteTicket(ticketId)
           .then(
             () => {
               deleteOperationLoading.value = false;
@@ -192,11 +215,15 @@ export default {
         deleteOperationLoading.value = false;
       }
     };
+    const submitValidation = async () => {
+      await validateTicket(ticketId);
+    };
     return {
       ticket,
       loaded,
       userData,
       submitDelete,
+      submitValidation
     };
   },
 };

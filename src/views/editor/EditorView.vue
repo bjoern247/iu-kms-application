@@ -5,7 +5,7 @@
     >
       <div class="box">
         <p class="title">Tickets</p>
-        <p class="subtitle">Neu <span class="tag is-rounded is-danger">0</span> In Bearbeitung <span class="tag is-rounded is-warning">0</span></p>
+        <p class="subtitle">Neu <span class="tag is-rounded is-danger">{{ticketData.created}}</span> In Bearbeitung <span class="tag is-rounded is-warning">{{ticketData.validated}}</span></p>
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">
@@ -63,16 +63,17 @@
   </div>
 </template>
 <script>
-import useFirebaseAuth from "../../store/firebase";
+import useFirebaseAuth, { getEditorTicketState, getUserData } from "../../store/firebase";
 export default {
   name: "EditorView",
   setup() {
-    const state = useFirebaseAuth();
     const { logout } = useFirebaseAuth();
-    const userData = state.userData.value;
+    const userData = getUserData();
+    const ticketData = getEditorTicketState();
     return {
       userData,
       logout,
+      ticketData
     };
   },
 };

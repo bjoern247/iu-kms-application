@@ -21,7 +21,7 @@ const userCollection = db.collection('users');
 const ticketCollection = db.collection('tickets');
 const subscribers = ref([]);
 const collectionListeners = ref([]);
-const ticketSubscribers = ref ([]);
+const ticketSubscribers = ref([]);
 const courses = ref([]);
 const tickets = ref([]);
 const ticket = ref();
@@ -41,6 +41,16 @@ const state = reactive({
     uid: null,
     appLoaded: false
   })
+});
+// Ticket State Object
+const studentTicketState = reactive({
+  created: null,
+  validated: null
+});
+
+const editorTicketState = reactive({
+  created: null,
+  validated: null
 });
 
 // AUTHENTICATION STATE MANAGEMT
@@ -216,14 +226,80 @@ export const loadTicket = async (id) => {
   })
 }
 
+
 // GET-Method for component access
 export const getTicket = () => {
   return ticket;
 }
 
 // GET-Method for component access
+export const getStudentTicketState = () => {
+  return studentTicketState;
+}
+
+// GET-Method for componenct access
+export const getEditorTicketState = () => {
+  return editorTicketState;
+}
+
+/* 
+Helper Methods for filtering ticket array to get amount of tickets in different states
+*/
+export const getStudentAmountCreated = () => {
+  return new Promise((resolve) => {
+    const ticketStudentAmountCreatedListener = ticketCollection.where("createdBy", "==", state.userData.uid).where("ticketStatus", "==", "created").onSnapshot(snapshot => {
+      const created = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      studentTicketState.created = created.length
+      resolve(true);
+    }) // Query for all tickets created by specified user
+    subscribers.value.push(ticketStudentAmountCreatedListener);
+    return null;
+  })
+}
+export const getStudentAmountValidated = () => {
+  return new Promise((resolve) => {
+    const ticketStudentAmountValidatedListener = ticketCollection.where("createdBy", "==", state.userData.uid).where("ticketStatus", "==", "validated").onSnapshot(snapshot => {
+      const validated = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      studentTicketState.validated = validated.length
+      resolve(true);
+    }) // Query for all tickets created by specified user
+    subscribers.value.push(ticketStudentAmountValidatedListener);
+    return null;
+  })
+}
+export const getEditorAmountCreated = async () => {
+  const courses = await getAssignedCourses(); // Editor's assigned courses
+  if (courses.length != 0) {
+    console.log('Ticket Collection listener started');
+    return new Promise((resolve) => {
+      const ticketEditorAmountCreatedListener = ticketCollection.where("courseId", "in", courses).where("ticketStatus", "==", "created").onSnapshot(snapshot => {
+        const created = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        editorTicketState.created = created.length
+        resolve(true);
+      }) // Query for all tickets in courses that Editor has assigned to himself
+      subscribers.value.push(ticketEditorAmountCreatedListener);
+      return null
+    })
+  }
+}
+export const getEditorAmountValidated = async () => {
+  const courses = await getAssignedCourses(); // Editor's assigned courses
+  if (courses.length != 0) {
+    console.log('Ticket Collection listener started');
+    return new Promise((resolve) => {
+      const ticketEditorAmountValidatedListener = ticketCollection.where("courseId", "in", courses).where("ticketStatus", "==", "validated").onSnapshot(snapshot => {
+        const validated = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        editorTicketState.validated = validated.length
+        resolve(true);
+      }) // Query for all tickets created by specified user
+      subscribers.value.push(ticketEditorAmountValidatedListener);
+      return null
+    })
+  }
+}
+
+// GET-Method for component access
 export const getTickets = () => {
-  console.log(tickets);
   return tickets
 }
 
@@ -253,7 +329,7 @@ export const getCourseDocById = (courseId) => {
     }).catch((error) => {
       console.log("Error getting documents: ", error);
       reject();
-  });
+    });
   })
 }
 
@@ -280,6 +356,20 @@ export const createTicket = async (name, text, category, courseId) => {
     }).catch((error) => {
       alert(error);
       reject();
+    });
+  })
+}
+
+// Validate ticket (next step in ticket lifecycle)
+export const validateTicket = (id) => {
+  return new Promise((resolve, reject) => {
+    ticketCollection.doc(id).update({
+      ticketStatus: 'validated'
+    }).then(() => {
+      resolve(true);
+    }).catch((error) => {
+      alert(error);
+      reject(error);
     });
   })
 }
@@ -490,10 +580,14 @@ export const startAllListeners = async () => {
   else if (state.userData.role === 'editor') {
     await loadMyCourses();
     await loadAssignedTickets();
+    getEditorAmountCreated(); // realtime created tickets ready for validation for editor home view
+    getEditorAmountValidated(); // realtime validated tickets ready for working on for editor home view
   }
   else if (state.userData.role === 'student') {
     await loadAllCourseIds();
     await loadCreatedTickets();
+    getStudentAmountCreated(); // realtime created tickets number for student home view
+    getStudentAmountValidated(); // realtime validated tickets number for student home view
   }
 }
 
