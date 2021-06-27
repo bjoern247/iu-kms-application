@@ -14,7 +14,6 @@ const config = {
 };
 firebase.initializeApp(config);
 
-
 // Variables
 const db = firebase.firestore();
 const courseCollection = db.collection('courses');
@@ -333,8 +332,6 @@ export const getCourses = () => {
   return courses
 }
 
-
-
 // Returns assigned courses for editors
 export const getAssignedCourses = () => {
   console.log("getting assigned courses");
@@ -355,8 +352,6 @@ export const getCourse = (id) => {
   })
   return course[0];
 }
-
-
 
 // Returns all editors that are not assigned to specified course
 export const loadUnassignedEditors = (course) => {
@@ -480,7 +475,6 @@ export const unassignEditor = async (uid, course, courseId) => {
   })
   console.log("Editor unassigned");
 }
-
 
 /*
 LISTENER MANAGEMENT
