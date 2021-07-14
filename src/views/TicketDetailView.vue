@@ -163,7 +163,7 @@
           </fieldset>
         </div>
       </div>
-      <hr />
+      <hr v-if="ticket.ticketStatus === 'closed'" />
       <!-- Abschlussbereich -->
       <div v-if="ticket.ticketStatus === 'closed'">
         <p class="title mt-4">Ticket abgeschlossen</p>
