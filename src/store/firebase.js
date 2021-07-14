@@ -56,6 +56,10 @@ const editorTicketState = reactive({
   created: null,
   validated: null
 });
+const adminUserState = reactive({
+  total: null,
+  deactivated: null
+})
 
 // AUTHENTICATION STATE MANAGEMT
 export default function () {
@@ -297,7 +301,7 @@ export const getEditorTicketState = () => {
 
 // GET-Method for component access
 export const getAdminUserState = () => {
-
+  return adminUserState;
 }
 
 /* 
@@ -354,6 +358,17 @@ export const getEditorAmountValidated = async () => {
       return null
     })
   }
+}
+export const getAdminUsersDeactivated = async () => {
+  return new Promise((resolve) => {
+    const deactivatedUsersListener = userCollection.where("deactivated", "==", true).onSnapshot(snapshot => {
+      const deactivatedUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      adminUserState.deactivated = deactivatedUsers.length
+      resolve(true);
+    }) // Query for all tickets created by specified user
+    subscribers.value.push(deactivatedUsersListener);
+    return null
+  })
 }
 
 // GET-Method for component access
@@ -674,6 +689,7 @@ export const startAllListeners = async () => {
   if (state.userData.role === 'admin') {
     await loadAllCourses();
     await loadAllTickets();
+    getAdminUsersDeactivated(); // realtime deactivated users number for admin home view
   }
   else if (state.userData.role === 'editor') {
     await loadMyCourses();
