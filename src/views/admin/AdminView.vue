@@ -30,7 +30,7 @@
                   to="/course-overview"
                 >
                   <span class="icon is-small">
-                    <i class="fas fa-edit"></i>
+                    <i class="far fa-edit"></i>
                   </span>
                   <span>Verwalten</span>
                 </router-link>
