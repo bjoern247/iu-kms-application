@@ -22,10 +22,13 @@ const ticketCollection = db.collection('tickets');
 const subscribers = ref([]);
 const collectionListeners = ref([]);
 const ticketSubscribers = ref([]);
+const userSubscribers = ref([]);
 const courses = ref([]);
 const tickets = ref([]);
+const assignedTickets = ref([]);
 const ticket = ref();
 const users = ref([]);
+const user = ref();
 const unassignedEditors = ref([]);
 const assignedEditors = ref([]);
 const backButtonDisabled = ref(false);
@@ -39,6 +42,7 @@ const state = reactive({
     email: true,
     role: null,
     uid: null,
+    deactivated: false,
     appLoaded: false
   })
 });
@@ -70,6 +74,7 @@ export default function () {
         state.userData.role = null;
         state.userData.uid = null;
         state.userData.email = null;
+        state.userData.deactivated = false;
         router.push("/login");
         unsubscribeAllListeners();
       })
@@ -92,6 +97,7 @@ export default function () {
                 state.userData.email = _data.email;
                 state.userData.role = _data.role;
                 state.userData.uid = _data.uid;
+                state.userData.deactivated = _data.deactivated;
                 console.log("AuthCheck");
                 startAllListeners().then(() => {
                   console.log(courses);
@@ -134,19 +140,29 @@ export const loadUsers = () => {
   })
 }
 
+// Admin: Load specific user from firestore
+export const loadUser = (id) => {
+  console.log('Specific user listener started');
+  return new Promise((resolve) => {
+    const userSubscriber = userCollection.doc(id).onSnapshot(doc => {
+      user.value = doc.data();
+      resolve(doc.data());
+      console.log(user.value);
+    })
+    userSubscribers.value.push(userSubscriber);
+    return user
+  })
+}
+
+
 // GET-Method for component
 export const getUsers = () => {
   return users
 }
 
 // GET-Method for component
-export const getUser = (id) => {
-  console.log(id);
-  const user = users.value.filter((item) => {
-    return item.uid === id
-  })
-  console.log(user[0]);
-  return user[0];
+export const getUser = () => {
+  return user
 }
 
 export const getUserData = () => {
@@ -167,6 +183,27 @@ export const updateUser = (doc, role) => {
   })
 }
 
+//Admin: Deactivate/Reactivate user
+export const toggleUserDeactivation = (uid) => {
+  console.log(uid);
+  return new Promise((resolve, reject) => {
+    userCollection.doc(uid).get().then(function (doc) {
+      if (doc.exists) {
+        console.log(doc.data().deactivated);
+        return doc.ref.update({
+          deactivated: !doc.data().deactivated
+        });
+      }
+    }).then(() => {
+      resolve(true);
+    }).catch((error) => {
+      alert(error);
+      reject
+    })
+  });
+}
+
+
 /*
 TICKETS
 */
@@ -184,18 +221,34 @@ export const loadAllTickets = () => {
   })
 }
 
-// Editor: loads all tickets that are created in assigned courses
-export const loadAssignedTickets = async () => {
+// Editor: loads all tickets that are created in assigned courses and are not assigned yet
+export const loadUnassignedTickets = async () => {
   const courses = await getAssignedCourses(); // Editor's assigned courses
   if (courses.length != 0) {
     console.log('Ticket Collection listener started');
     return new Promise((resolve) => {
-      const ticketsSubscriber = ticketCollection.where("courseId", "in", courses).onSnapshot(snapshot => {
+      const ticketsSubscriber = ticketCollection.where("courseId", "in", courses).where("ticketEditor", "==", "").onSnapshot(snapshot => {
         tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
         resolve(true);
       }) // Query for all tickets in courses that Editor has assigned to himself
       subscribers.value.push(ticketsSubscriber);
       return tickets
+    })
+  }
+}
+
+// Editor: loads assigned tickets
+export const loadAssignedTickets = async () => {
+  const courses = await getAssignedCourses(); // Editor's assigned courses
+  if (courses.length != 0) {
+    console.log('Ticket Collection listener started');
+    return new Promise((resolve) => {
+      const ticketsSubscriber = ticketCollection.where("courseId", "in", courses).where("ticketEditor", "==", state.userData.uid).onSnapshot(snapshot => {
+        assignedTickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        resolve(true);
+      }) // Query for all tickets in courses that Editor has assigned to himself
+      subscribers.value.push(ticketsSubscriber);
+      return assignedTickets
     })
   }
 }
@@ -237,9 +290,14 @@ export const getStudentTicketState = () => {
   return studentTicketState;
 }
 
-// GET-Method for componenct access
+// GET-Method for component access
 export const getEditorTicketState = () => {
   return editorTicketState;
+}
+
+// GET-Method for component access
+export const getAdminUserState = () => {
+
 }
 
 /* 
@@ -287,7 +345,7 @@ export const getEditorAmountValidated = async () => {
   if (courses.length != 0) {
     console.log('Ticket Collection listener started');
     return new Promise((resolve) => {
-      const ticketEditorAmountValidatedListener = ticketCollection.where("courseId", "in", courses).where("ticketStatus", "==", "validated").onSnapshot(snapshot => {
+      const ticketEditorAmountValidatedListener = ticketCollection.where("courseId", "in", courses).where("ticketStatus", "==", "validated").where("ticketEditor", "==", state.userData.uid).onSnapshot(snapshot => {
         const validated = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
         editorTicketState.validated = validated.length
         resolve(true);
@@ -301,6 +359,11 @@ export const getEditorAmountValidated = async () => {
 // GET-Method for component access
 export const getTickets = () => {
   return tickets
+}
+
+// GET-Method for component access
+export const getAssignedTickets = () => {
+  return assignedTickets
 }
 
 // Load Course-IDs for ticket creation (Dropdown: Select Course)
@@ -345,11 +408,13 @@ export const createTicket = async (name, text, category, courseId) => {
       ticketCategory: category,
       ticketId: newTicketRef.id,
       ticketStatus: 'created',
+      ticketEditor: '',
       courseDocId: docId,
       courseId: courseId,
       datetime: new Date(),
       createdBy: state.userData.uid,
-      creatorMail: state.userData.email
+      creatorMail: state.userData.email,
+      ticketLog: ['created: ' + new Date()]
     }).then(() => {
       console.log("Ticket sucessfully created")
       resolve();
@@ -364,7 +429,40 @@ export const createTicket = async (name, text, category, courseId) => {
 export const validateTicket = (id) => {
   return new Promise((resolve, reject) => {
     ticketCollection.doc(id).update({
-      ticketStatus: 'validated'
+      ticketStatus: 'validated',
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('validated: ' + new Date()),
+      ticketEditor: state.userData.uid
+    }).then(() => {
+      resolve(true);
+    }).catch((error) => {
+      alert(error);
+      reject(error);
+    });
+  })
+}
+
+// Admin: Reactivate ticket after it was wrongfully flagged for deletion by an editor
+export const reactivateTicket = (id) => {
+  return new Promise((resolve, reject) => {
+    ticketCollection.doc(id).update({
+      ticketStatus: 'created',
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('reactivated: ' + new Date()),
+      ticketEditor: ''
+    }).then(() => {
+      resolve(true);
+    }).catch((error) => {
+      alert(error);
+      reject(error);
+    });
+  })
+}
+
+// Allows editor to flag tickets for deletion by an Admin
+export const flagTicketForDeletion = (id) => {
+  return new Promise((resolve, reject) => {
+    ticketCollection.doc(id).update({
+      ticketStatus: 'awaiting deletion',
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('awaiting deletion: ' + new Date())
     }).then(() => {
       resolve(true);
     }).catch((error) => {
@@ -579,6 +677,7 @@ export const startAllListeners = async () => {
   }
   else if (state.userData.role === 'editor') {
     await loadMyCourses();
+    await loadUnassignedTickets();
     await loadAssignedTickets();
     getEditorAmountCreated(); // realtime created tickets ready for validation for editor home view
     getEditorAmountValidated(); // realtime validated tickets ready for working on for editor home view
@@ -606,10 +705,16 @@ export const stopCourseListeners = () => {
 }
 
 // For detaching specific realtime ticket listener
-export const stopTicketListener = () => {
+export const stopTicketListeners = () => {
   ticketSubscribers.value.forEach(subscriber => subscriber());
   ticketSubscribers.value = [];
-  console.log('Specific ticket listener stopped');
+  console.log('Specific ticket listener(s) stopped');
+}
+
+export const stopUserListeners = () => {
+  userSubscribers.value.forEach(subscriber => subscriber());
+  userSubscribers.value = [];
+  console.log('Specific user listener(s) stopped');
 }
 
 export const disableBackButton = () => {
@@ -627,6 +732,9 @@ export const getbackButtonState = () => {
 
 // Detach all realtime listeners, for example when logging user out
 export const unsubscribeAllListeners = () => {
+  stopTicketListeners();
+  stopCourseListeners();
+  stopUserListeners();
   // called by auth.js on user signout to unsubscribe all firestore realtime listeners
   subscribers.value.forEach(subscriber => subscriber());
   subscribers.value = [];
