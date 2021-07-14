@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
-import useFirebaseAuth, { enableBackButton } from '../store/firebase';
+import useFirebaseAuth, { enableBackButton, getUserData } from '../store/firebase';
 
 const state = useFirebaseAuth();
+const userData = getUserData();
 
 const routes = [
   {
@@ -11,7 +12,9 @@ const routes = [
     name: 'Home',
     component: Home,
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: false
     }
   },
   {
@@ -22,7 +25,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/TicketOverview.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: false
     }
   },
   {
@@ -33,7 +38,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseCreation.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: true
     }
   },
   {
@@ -44,7 +51,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/UserOverview.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: true
     }
   },
   {
@@ -55,7 +64,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseOverview.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: true
     }
   },
   {
@@ -66,7 +77,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/editor/MyCourses.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: true,
+      adminOnly: false
     }
   },
   {
@@ -77,7 +90,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/editor/MyTickets.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: true,
+      adminOnly: false
     }
   },
   {
@@ -88,7 +103,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseEditors.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: true
     }
   },
   {
@@ -99,7 +116,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/TicketDetailView.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: false
     }
   },
   {
@@ -110,7 +129,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/editor/CourseDetailView.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: true,
+      adminOnly: false
     }
   },
   {
@@ -121,7 +142,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseAdministration.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: true
     }
   },
   {
@@ -132,7 +155,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/UserAdministration.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: true
     }
   },
   {
@@ -143,7 +168,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/student/TicketCreation.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: false
     }
   },
   {
@@ -154,7 +181,9 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "tickets" */ '../views/Settings.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      editorOnly: false,
+      adminOnly: false
     }
   },
   {
@@ -171,15 +200,34 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const editorOnly = to.matched.some(record => record.meta.editorOnly);
+  const adminOnly = to.matched.some(record => record.meta.adminOnly);
   if (requiresAuth) {
     if (state.user.value !== null) {
-      next();
+      console.log(userData.role);
+      if (editorOnly) {
+        if (userData.role === 'editor' || userData.role === 'admin') {
+          next();
+        } else {
+          next('/') // maybe change with forbidden page
+        }
+      }
+      else if (adminOnly) {
+        if (userData.role === 'admin') {
+          next();
+        } else {
+          next('/') // maybe change with forbidden page
+        }
+      } else {
+        next();
+      }
     } else {
-      next('Login');
+      next();
     }
   } else {
     next();
   }
+  
   if (to.path == '/') {
     // Enables BackButton again after Delete Operations
     enableBackButton();
