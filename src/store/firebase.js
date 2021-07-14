@@ -728,8 +728,8 @@ LISTENER MANAGEMENT
 
 // Role based loading
 export const startAllListeners = async () => {
-  await loadUsers();
   if (state.userData.role === 'admin') {
+    await loadUsers();
     await loadAllCourses();
     await loadAllTickets();
     getAdminUsersDeactivated(); // realtime deactivated users number for admin home view
