@@ -234,7 +234,7 @@
                 <label class="label">Abschluß-Kommentar</label>
                 <div class="control">
                   <textarea
-                    v-model="form.ticketText"
+                    v-model="form.closingComment"
                     class="textarea"
                     placeholder="..."
                   ></textarea>

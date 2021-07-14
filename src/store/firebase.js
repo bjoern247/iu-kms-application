@@ -241,6 +241,38 @@ export const loadUnassignedTickets = async () => {
   }
 }
 
+// Editor: FILTER: LÖSCHUNG loads all tickets that are created in assigned courses and are not assigned yet
+export const loadUnassignedTicketsFilterLöschung = async () => {
+  const courses = await getAssignedCourses(); // Editor's assigned courses
+  if (courses.length != 0) {
+    console.log('Ticket Collection listener started');
+    return new Promise((resolve) => {
+      const ticketsSubscriber = ticketCollection.where("courseId", "in", courses).where("ticketEditor", "==", "").where("ticketStatus", "==", "awaiting deletion").onSnapshot(snapshot => {
+        tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        resolve(true);
+      }) // Query for all tickets in courses that Editor has assigned to himself
+      subscribers.value.push(ticketsSubscriber);
+      return tickets
+    })
+  }
+}
+
+// Editor: FILTER: In Prüfung loads all tickets that are created in assigned courses and are not assigned yet
+export const loadUnassignedTicketsFilterValidation = async () => {
+  const courses = await getAssignedCourses(); // Editor's assigned courses
+  if (courses.length != 0) {
+    console.log('Ticket Collection listener started');
+    return new Promise((resolve) => {
+      const ticketsSubscriber = ticketCollection.where("courseId", "in", courses).where("ticketEditor", "==", "").where("ticketStatus", "==", "created").onSnapshot(snapshot => {
+        tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        resolve(true);
+      }) // Query for all tickets in courses that Editor has assigned to himself
+      subscribers.value.push(ticketsSubscriber);
+      return tickets
+    })
+  }
+}
+
 // Editor: loads assigned tickets
 export const loadAssignedTickets = async () => {
   const courses = await getAssignedCourses(); // Editor's assigned courses
@@ -256,6 +288,9 @@ export const loadAssignedTickets = async () => {
     })
   }
 }
+
+
+
 
 // Student: Load all tickets created by user
 export const loadCreatedTickets = () => {
@@ -520,7 +555,13 @@ export const flagTicketForDeletion = (id) => {
   return new Promise((resolve, reject) => {
     ticketCollection.doc(id).update({
       ticketStatus: 'awaiting deletion',
-      ticketLog: firebase.firestore.FieldValue.arrayUnion('Löschung beantragt: ' + new Date().toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }))
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('Löschung beantragt: ' + new Date().toLocaleDateString('de-DE', {
+        day: 'numeric',
+        year: 'numeric',
+        month: '2-digit',
+        hour: 'numeric',
+        minute: 'numeric',
+      }))
     }).then(() => {
       resolve(true);
     }).catch((error) => {

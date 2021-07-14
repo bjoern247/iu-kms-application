@@ -78,36 +78,42 @@
               is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile
             "
           >
-            <span class="tag is-medium is-danger" v-if="ticket.courseId === 'Kurs existiert nicht'">Kurs inexistent</span>
-            <span class="tag is-medium is-primary" v-else>{{ticket.courseId}}</span>
+            <span
+              class="tag is-medium is-danger"
+              v-if="ticket.courseId === 'Kurs existiert nicht'"
+              >Kurs inexistent</span
+            >
+            <span class="tag is-medium is-primary" v-else>{{
+              ticket.courseId
+            }}</span>
           </div>
           <div
-          class="
-            column
-            is-2-desktop is-2-tablet is-2-widescreen is-3-fullhd is-3-mobile
-          "
-        >
-          <span
-                  v-if="ticket.ticketStatus === 'created'"
-                  class="tag is-medium is-dark"
-                  >In Prüfung</span
-                >
-                <span
-                  v-else-if="ticket.ticketStatus === 'validated'"
-                  class="tag is-medium is-warning"
-                  >In Bearbeitung</span
-                >
-                <span
-                  v-else-if="ticket.ticketStatus === 'closed'"
-                  class="tag is-medium is-success"
-                  >Abgeschlossen</span
-                >
-                <span
-                  v-else-if="ticket.ticketStatus === 'awaiting deletion'"
-                  class="tag is-medium is-danger"
-                  >Löschung</span
-                >
-        </div>
+            class="
+              column
+              is-2-desktop is-2-tablet is-2-widescreen is-3-fullhd is-3-mobile
+            "
+          >
+            <span
+              v-if="ticket.ticketStatus === 'created'"
+              class="tag is-medium is-dark"
+              >In Prüfung</span
+            >
+            <span
+              v-else-if="ticket.ticketStatus === 'validated'"
+              class="tag is-medium is-warning"
+              >In Bearbeitung</span
+            >
+            <span
+              v-else-if="ticket.ticketStatus === 'closed'"
+              class="tag is-medium is-success"
+              >Abgeschlossen</span
+            >
+            <span
+              v-else-if="ticket.ticketStatus === 'awaiting deletion'"
+              class="tag is-medium is-danger"
+              >Löschung</span
+            >
+          </div>
           <div
             class="
               column
@@ -120,7 +126,17 @@
             "
           >
             <span>
-              {{ ticket.datetime.toDate().toLocaleDateString("de-DE", {day: "numeric", year: "numeric", month: "2-digit", hour: "numeric", minute: "numeric"}) }}
+              {{
+                ticket.datetime
+                  .toDate()
+                  .toLocaleDateString("de-DE", {
+                    day: "numeric",
+                    year: "numeric",
+                    month: "2-digit",
+                    hour: "numeric",
+                    minute: "numeric",
+                  })
+              }}
             </span>
           </div>
           <div
@@ -141,13 +157,15 @@
             </div>
           </div>
         </div>
-        <hr class="m-0">
+        <hr class="m-0" />
       </div>
       <hr class="mb-0" />
       <p class="panel-tabs">
-        <a class="is-active">Alle</a>
-        <a>In Prüfung</a>
-        <a>Löschung</a>
+        <a :class="{ 'is-active': showingAll }" @click="showAll()">Alle</a>
+        <a :class="{ 'is-active': inValidation }" @click="showInValidation()">In Prüfung</a>
+        <a :class="{ 'is-active': inDeletion }" @click="showInDeletion()"
+          >Löschung</a
+        >
         <a v-if="userData.role === 'student'">In Bearbeitung</a>
         <a v-if="userData.role === 'student'">Abgeschlossen</a>
       </p>
@@ -156,21 +174,60 @@
 </template>
 
 <script>
-import useFirebase, { getTickets } from "../store/firebase";
+import useFirebase, {
+  getTickets,
+  loadUnassignedTickets,
+  loadUnassignedTicketsFilterLöschung,
+  loadUnassignedTicketsFilterValidation
+} from "../store/firebase";
 import { useRouter } from "vue-router";
+import { ref } from "vue";
 export default {
   setup() {
     const tickets = getTickets();
     const router = useRouter();
     const state = useFirebase();
     const userData = state.userData.value;
+    const showingAll = ref(true);
+    const inDeletion = ref(false);
+    const inValidation = ref(false);
     function showTicket(id) {
-      router.push('/ticket-detail-view/' + id);
+      router.push("/ticket-detail-view/" + id);
     }
+    const showInDeletion = () => {
+      if (userData.role === "editor") {
+        loadUnassignedTicketsFilterLöschung();
+        showingAll.value = false;
+        inValidation.value = false;
+        inDeletion.value = true;
+      }
+    };
+    const showInValidation = () => {
+      if (userData.role === "editor") {
+        loadUnassignedTicketsFilterValidation();
+        showingAll.value = false;
+        inValidation.value = true;
+        inDeletion.value = false;
+      }
+    };
+    const showAll = () => {
+      if (userData.role === "editor") {
+        showingAll.value = true;
+        inValidation.value = false;
+        inDeletion.value = false;
+        loadUnassignedTickets();
+      }
+    };
     return {
       tickets,
       userData,
-      showTicket
+      showTicket,
+      showInDeletion,
+      inDeletion,
+      showingAll,
+      inValidation,
+      showAll,
+      showInValidation,
     };
   },
 };
