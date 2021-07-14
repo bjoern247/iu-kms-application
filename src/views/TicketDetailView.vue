@@ -11,7 +11,7 @@
       class="subtitle"
       v-if="userData.role === 'student' && ticket.ticketStatus === 'created'"
     >
-      Das Ticket wird zur Zeit geprüft. Die Bearbeitung erfolgt anschließend
+      Das Ticket wird zur Zeit geprüft. Die Bearbeitung erfolgt anschließend.
     </p>
     <p
       class="subtitle"
@@ -140,17 +140,17 @@
               <div class="control has-icons-right">
                 <span
                   v-if="ticket.ticketStatus === 'created'"
-                  class="tag is-medium is-light"
+                  class="tag is-medium is-dark"
                   >In Prüfung</span
                 >
                 <span
                   v-else-if="ticket.ticketStatus === 'validated'"
-                  class="tag is-medium is-success"
+                  class="tag is-medium is-warning"
                   >In Bearbeitung</span
                 >
                 <span
                   v-else-if="ticket.ticketStatus === 'closed'"
-                  class="tag is-medium is-dark"
+                  class="tag is-medium is-success"
                   >Abgeschlossen</span
                 >
                 <span
@@ -161,6 +161,64 @@
               </div>
             </div>
           </fieldset>
+        </div>
+      </div>
+      <hr />
+      <!-- Abschlussbereich -->
+      <div v-if="ticket.ticketStatus === 'closed'">
+        <p class="title mt-4">Ticket abgeschlossen</p>
+        <div class="columns">
+          <div class="column is-8">
+            <div class="field">
+              <label class="label">Ticket-Text</label>
+              <div class="control">
+                <fieldset disabled>
+                  <textarea
+                    v-model="ticket.ticketClosingComment"
+                    class="textarea"
+                    type="text"
+                    placeholder="Error-732"
+                  ></textarea>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+          <div class="column is-4">
+            <fieldset disabled>
+              <div class="field">
+                <label class="label">Bearbeiter</label>
+                <div class="control has-icons-right">
+                  <input
+                    class="input"
+                    type="text"
+                    v-model="ticket.ticketEditorName"
+                    placeholder="Bearbeiter"
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Geschlossen am</label>
+                <div class="control has-icons-right">
+                  <input
+                    class="input"
+                    type="text"
+                    :value="
+                      ticket.ticketClosingDate
+                        .toDate()
+                        .toLocaleDateString('de-DE', {
+                          day: 'numeric',
+                          year: 'numeric',
+                          month: '2-digit',
+                          hour: 'numeric',
+                          minute: 'numeric',
+                        })
+                    "
+                    placeholder="Datum"
+                  />
+                </div>
+              </div>
+            </fieldset>
+          </div>
         </div>
       </div>
       <hr />
@@ -184,7 +242,11 @@
               </div>
               <div class="field">
                 <div class="control">
-                  <button class="button is-success" type="submit">
+                  <button
+                    class="button is-success"
+                    type="submit"
+                    @click="submitCloseTicket()"
+                  >
                     <span class="icon is-small">
                       <i class="fas fa-save"></i>
                     </span>
@@ -203,7 +265,7 @@
         <p class="title mt-4">Ticketprüfung</p>
         <div class="columns">
           <div class="column is-8">
-            <div class="field mt-2">
+            <div class="field">
               <label class="label">Prüfungs-Optionen</label>
               <div class="control buttons">
                 <button
@@ -238,7 +300,7 @@
         <p class="title mt-4">Administratorbereich</p>
         <div class="columns">
           <div class="column is-8">
-            <div class="field mt-2" v-if="userData.role === 'admin'">
+            <div class="field" v-if="userData.role === 'admin'">
               <label class="label">Ticket-Log</label>
               <div class="control">
                 <fieldset disabled>
@@ -250,7 +312,7 @@
                 </fieldset>
               </div>
             </div>
-            <div class="field mt-2" v-if="userData.role === 'admin'">
+            <div class="field" v-if="userData.role === 'admin'">
               <label class="label">Administrator-Operationen</label>
               <div class="control buttons mt-2">
                 <button
@@ -279,6 +341,32 @@
               </div>
             </div>
           </div>
+          <div class="column is-4">
+            <fieldset disabled>
+              <div class="field">
+                <label class="label">Bearbeiter</label>
+                <div class="control has-icons-right">
+                  <input
+                    class="input"
+                    type="text"
+                    v-model="ticket.ticketEditorMail"
+                    placeholder="E-Mail"
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Bearbeiter-ID</label>
+                <div class="control has-icons-right">
+                  <input
+                    class="input"
+                    type="text"
+                    v-model="ticket.ticketEditor"
+                    placeholder="User-ID"
+                  />
+                </div>
+              </div>
+            </fieldset>
+          </div>
         </div>
       </div>
     </form>
@@ -299,6 +387,7 @@ import {
   reactivateTicket,
   flagTicketForDeletion,
   stopTicketListeners,
+  closeTicket,
 } from "../store/firebase";
 import { useRouter } from "vue-router";
 import { onUnmounted } from "@vue/runtime-core";
@@ -384,7 +473,6 @@ export default {
       }
     };
     const flagForDeletion = async () => {
-      deleteOperationLoading.value = true;
       const result = confirm(
         "Die Beantragung zur Löschung kann nicht rückgängig gemacht werden!"
       );
@@ -406,6 +494,26 @@ export default {
         deleteOperationLoading.value = false;
       }
     };
+    const submitCloseTicket = async () => {
+      const result = confirm(
+        "Das Ticket wird abgeschlossen und kann nicht mehr bearbeitet werden!"
+      );
+      if (result) {
+        await closeTicket(ticketId, form.closingComment)
+          .then(
+            () => {
+              router.push("/assigned-tickets");
+              form.closingComment = "";
+            },
+            (error) => {
+              alert(error);
+            }
+          )
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    };
     return {
       ticket,
       form,
@@ -416,7 +524,8 @@ export default {
       flagForDeletion,
       submitReactivation,
       validationOperationLoading,
-      deleteOperationLoading
+      deleteOperationLoading,
+      submitCloseTicket,
     };
   },
 };

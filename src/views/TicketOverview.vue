@@ -78,7 +78,8 @@
               is-2-desktop is-2-tablet is-2-widescreen is-2-fullhd is-2-mobile
             "
           >
-            <span class="tag is-medium is-info">{{ ticket.courseId }} </span>
+            <span class="tag is-medium is-danger" v-if="ticket.courseId === 'Kurs existiert nicht'">Kurs inexistent</span>
+            <span class="tag is-medium is-primary" v-else>{{ticket.courseId}}</span>
           </div>
           <div
           class="
@@ -93,12 +94,12 @@
                 >
                 <span
                   v-else-if="ticket.ticketStatus === 'validated'"
-                  class="tag is-medium is-success"
+                  class="tag is-medium is-warning"
                   >In Bearbeitung</span
                 >
                 <span
                   v-else-if="ticket.ticketStatus === 'closed'"
-                  class="tag is-medium is-dark"
+                  class="tag is-medium is-success"
                   >Abgeschlossen</span
                 >
                 <span
@@ -147,8 +148,8 @@
         <a class="is-active">Alle</a>
         <a>In Prüfung</a>
         <a>Löschung</a>
-        <a>In Bearbeitung</a>
-        <a>Abgeschlossen</a>
+        <a v-if="userData.role === 'student'">In Bearbeitung</a>
+        <a v-if="userData.role === 'student'">Abgeschlossen</a>
       </p>
     </div>
   </nav>

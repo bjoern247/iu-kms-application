@@ -429,7 +429,13 @@ export const createTicket = async (name, text, category, courseId) => {
       datetime: new Date(),
       createdBy: state.userData.uid,
       creatorMail: state.userData.email,
-      ticketLog: ['Erstellt: ' + new Date().toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })]
+      ticketLog: ['Erstellt: ' + new Date().toLocaleDateString('de-DE', {
+        day: 'numeric',
+        year: 'numeric',
+        month: '2-digit',
+        hour: 'numeric',
+        minute: 'numeric',
+      })]
     }).then(() => {
       console.log("Ticket sucessfully created")
       resolve();
@@ -445,8 +451,39 @@ export const validateTicket = (id) => {
   return new Promise((resolve, reject) => {
     ticketCollection.doc(id).update({
       ticketStatus: 'validated',
-      ticketLog: firebase.firestore.FieldValue.arrayUnion('An Bearbeiter zugewiesen: ' + new Date().toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })),
-      ticketEditor: state.userData.uid
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('An Bearbeiter zugewiesen: ' + new Date().toLocaleDateString('de-DE', {
+        day: 'numeric',
+        year: 'numeric',
+        month: '2-digit',
+        hour: 'numeric',
+        minute: 'numeric',
+      })),
+      ticketEditor: state.userData.uid,
+      ticketEditorMail: state.userData.email,
+      ticketEditorName: state.userData.displayName
+    }).then(() => {
+      resolve(true);
+    }).catch((error) => {
+      alert(error);
+      reject(error);
+    });
+  })
+}
+
+// Close ticket (last step in ticket lifecycle)
+export const closeTicket = (id, comment) => {
+  return new Promise((resolve, reject) => {
+    ticketCollection.doc(id).update({
+      ticketStatus: 'closed',
+      ticketClosingDate: new Date(),
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('Ticket geschlossen: ' + new Date().toLocaleDateString('de-DE', {
+        day: 'numeric',
+        year: 'numeric',
+        month: '2-digit',
+        hour: 'numeric',
+        minute: 'numeric',
+      })),
+      ticketClosingComment: comment
     }).then(() => {
       resolve(true);
     }).catch((error) => {
@@ -461,7 +498,13 @@ export const reactivateTicket = (id) => {
   return new Promise((resolve, reject) => {
     ticketCollection.doc(id).update({
       ticketStatus: 'created',
-      ticketLog: firebase.firestore.FieldValue.arrayUnion('Reaktiviert: ' + new Date().toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })),
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('Reaktiviert: ' + new Date().toLocaleDateString('de-DE', {
+        day: 'numeric',
+        year: 'numeric',
+        month: '2-digit',
+        hour: 'numeric',
+        minute: 'numeric',
+      })),
       ticketEditor: ''
     }).then(() => {
       resolve(true);

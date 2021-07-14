@@ -145,8 +145,6 @@
       <hr class="mb-0" />
       <p class="panel-tabs">
         <a class="is-active">Alle</a>
-        <a>In Prüfung</a>
-        <a>Löschung</a>
         <a>In Bearbeitung</a>
         <a>Abgeschlossen</a>
       </p>
