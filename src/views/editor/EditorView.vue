@@ -5,7 +5,7 @@
     >
       <div class="box">
         <p class="title">Tickets</p>
-        <p class="subtitle">Neu <span class="tag is-rounded is-danger">{{ticketData.created}}</span> In Bearbeitung <span class="tag is-rounded is-warning">{{ticketData.validated}}</span></p>
+        <p class="subtitle">Inbox <span class="tag is-rounded is-danger">{{ticketData.created}}</span> In Bearbeitung <span class="tag is-rounded is-warning">{{ticketData.validated}}</span></p>
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">
@@ -15,9 +15,22 @@
                   class="button is-primary is-fullwidth"
                 >
                   <span class="icon is-small">
+                    <i class="fas fa-inbox"></i>
+                  </span>
+                  <span>Inbox</span>
+                </router-link>
+              </p>
+            </div>
+            <div class="field">
+              <p class="control">
+                <router-link
+                  class="button is-primary is-fullwidth"
+                  to="/assigned-tickets"
+                >
+                  <span class="icon is-small">
                     <i class="far fa-edit"></i>
                   </span>
-                  <span>Zur Bearbeitung</span>
+                  <span>Meine Tickets</span>
                 </router-link>
               </p>
             </div>
