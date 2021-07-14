@@ -429,7 +429,7 @@ export const createTicket = async (name, text, category, courseId) => {
       datetime: new Date(),
       createdBy: state.userData.uid,
       creatorMail: state.userData.email,
-      ticketLog: ['created: ' + new Date()]
+      ticketLog: ['Erstellt: ' + new Date().toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })]
     }).then(() => {
       console.log("Ticket sucessfully created")
       resolve();
@@ -445,7 +445,7 @@ export const validateTicket = (id) => {
   return new Promise((resolve, reject) => {
     ticketCollection.doc(id).update({
       ticketStatus: 'validated',
-      ticketLog: firebase.firestore.FieldValue.arrayUnion('validated: ' + new Date()),
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('An Bearbeiter zugewiesen: ' + new Date().toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })),
       ticketEditor: state.userData.uid
     }).then(() => {
       resolve(true);
@@ -461,7 +461,7 @@ export const reactivateTicket = (id) => {
   return new Promise((resolve, reject) => {
     ticketCollection.doc(id).update({
       ticketStatus: 'created',
-      ticketLog: firebase.firestore.FieldValue.arrayUnion('reactivated: ' + new Date()),
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('Reaktiviert: ' + new Date().toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })),
       ticketEditor: ''
     }).then(() => {
       resolve(true);
@@ -477,7 +477,7 @@ export const flagTicketForDeletion = (id) => {
   return new Promise((resolve, reject) => {
     ticketCollection.doc(id).update({
       ticketStatus: 'awaiting deletion',
-      ticketLog: firebase.firestore.FieldValue.arrayUnion('awaiting deletion: ' + new Date())
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('Löschung beantragt: ' + new Date().toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }))
     }).then(() => {
       resolve(true);
     }).catch((error) => {

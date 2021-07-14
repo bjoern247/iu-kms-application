@@ -26,15 +26,21 @@
     </p>
     <p
       class="subtitle"
-      v-if="userData.role === 'editor' && ticket.ticketStatus === 'awaiting deletion'"
+      v-if="
+        userData.role === 'editor' &&
+        ticket.ticketStatus === 'awaiting deletion'
+      "
     >
       Das Ticket wurde zur Löschung durch einen Administrator vorgemerkt.
     </p>
     <p
       class="subtitle"
-      v-if="userData.role === 'admin' && ticket.ticketStatus === 'awaiting deletion'"
+      v-if="
+        userData.role === 'admin' && ticket.ticketStatus === 'awaiting deletion'
+      "
     >
-      Das Ticket wurde von einem Bearbeiter zur Löschung markiert. Löschung oder Reaktivierung möglich.
+      Das Ticket wurde von einem Bearbeiter zur Löschung markiert. Löschung oder
+      Reaktivierung möglich.
     </p>
     <form>
       <div class="columns">
@@ -89,86 +95,10 @@
                   class="textarea"
                   type="text"
                   placeholder="Error-732"
-                  rows="10"
                 ></textarea>
               </div>
             </div>
           </fieldset>
-          <div class="field" v-if="userData.role === 'admin'">
-            <label class="label">Admin-Ticket-Log</label>
-            <div class="control">
-              <fieldset disabled>
-                <div v-for="element in ticket.ticketLog" :key="element">
-                  <textarea
-                    :value="element"
-                    class="textarea"
-                    type="text"
-                    placeholder="Error-732"
-                  ></textarea>
-                </div>
-              </fieldset>
-            </div>
-          </div>
-          <div class="field mt-2" v-if="userData.role === 'admin'">
-            <label class="label">Administrator-Operationen</label>
-            <div class="control buttons mt-2">
-              <button
-                class="button is-danger"
-                :class="{ 'is-loading': deleteOperationLoading }"
-                type="button"
-                @click="submitDelete()"
-              >
-                <span class="icon is-small">
-                  <i class="fas fa-trash-alt"></i>
-                </span>
-                <span>Löschen</span>
-              </button>
-              <button v-if="ticket.ticketStatus === 'awaiting deletion'"
-                class="button is-warning"
-                :class="{ 'is-loading': validationOperationLoading }"
-                type="button"
-                @click="submitReactivation()"
-              >
-                <span class="icon is-small">
-                  <i class="fas fa-undo"></i>
-                </span>
-                <span>Reaktivieren</span>
-              </button>
-            </div>
-          </div>
-          <!-- Editor -->
-          <div
-            class="field mt-2"
-            v-if="
-              userData.role === 'editor' && ticket.ticketStatus === 'created'
-            "
-          >
-            <label class="label">Prüfungs-Optionen</label>
-            <div class="control buttons">
-              <button
-                class="button is-success"
-                :class="{ 'is-loading': deleteOperationLoading }"
-                type="button"
-                @click="submitValidation()"
-              >
-                <span class="icon is-small">
-                  <i class="fas fa-clipboard-check"></i>
-                </span>
-                <span>Mir zuweisen</span>
-              </button>
-              <button
-                class="button is-danger"
-                :class="{ 'is-loading': validationOperationLoading }"
-                type="button"
-                @click="flagForDeletion()"
-              >
-                <span class="icon is-small">
-                  <i class="fas fa-flag"></i>
-                </span>
-                <span>Löschung beantragen</span>
-              </button>
-            </div>
-          </div>
         </div>
         <div class="column is-4">
           <fieldset disabled>
@@ -233,6 +163,124 @@
           </fieldset>
         </div>
       </div>
+      <hr />
+      <!-- Ticketbearbeitung -->
+      <div
+        v-if="userData.role === 'editor' && ticket.ticketStatus === 'validated'"
+      >
+        <p class="title mt-4">Ticketbearbeitung</p>
+        <div class="columns">
+          <div class="column is-8">
+            <form @submit.prevent="onSubmit">
+              <div class="field">
+                <label class="label">Abschluß-Kommentar</label>
+                <div class="control">
+                  <textarea
+                    v-model="form.ticketText"
+                    class="textarea"
+                    placeholder="..."
+                  ></textarea>
+                </div>
+              </div>
+              <div class="field">
+                <div class="control">
+                  <button class="button is-success" type="submit">
+                    <span class="icon is-small">
+                      <i class="fas fa-save"></i>
+                    </span>
+                    <span>Ticket schließen</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Ticketprüfung -->
+      <div
+        v-if="userData.role === 'editor' && ticket.ticketStatus === 'created'"
+      >
+        <p class="title mt-4">Ticketprüfung</p>
+        <div class="columns">
+          <div class="column is-8">
+            <div class="field mt-2">
+              <label class="label">Prüfungs-Optionen</label>
+              <div class="control buttons">
+                <button
+                  class="button is-success"
+                  :class="{ 'is-loading': deleteOperationLoading }"
+                  type="button"
+                  @click="submitValidation()"
+                >
+                  <span class="icon is-small">
+                    <i class="fas fa-clipboard-check"></i>
+                  </span>
+                  <span>Mir zuweisen</span>
+                </button>
+                <button
+                  class="button is-danger"
+                  :class="{ 'is-loading': validationOperationLoading }"
+                  type="button"
+                  @click="flagForDeletion()"
+                >
+                  <span class="icon is-small">
+                    <i class="fas fa-flag"></i>
+                  </span>
+                  <span>Löschung beantragen</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Administratorbereich -->
+      <div v-if="userData.role === 'admin'">
+        <p class="title mt-4">Administratorbereich</p>
+        <div class="columns">
+          <div class="column is-8">
+            <div class="field mt-2" v-if="userData.role === 'admin'">
+              <label class="label">Ticket-Log</label>
+              <div class="control">
+                <fieldset disabled>
+                  <div v-for="element in ticket.ticketLog" :key="element">
+                    <ul>
+                      <li>- {{ element }}</li>
+                    </ul>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+            <div class="field mt-2" v-if="userData.role === 'admin'">
+              <label class="label">Administrator-Operationen</label>
+              <div class="control buttons mt-2">
+                <button
+                  class="button is-danger"
+                  :class="{ 'is-loading': deleteOperationLoading }"
+                  type="button"
+                  @click="submitDelete()"
+                >
+                  <span class="icon is-small">
+                    <i class="fas fa-trash-alt"></i>
+                  </span>
+                  <span>Löschen</span>
+                </button>
+                <button
+                  v-if="ticket.ticketStatus === 'awaiting deletion'"
+                  class="button is-warning"
+                  :class="{ 'is-loading': validationOperationLoading }"
+                  type="button"
+                  @click="submitReactivation()"
+                >
+                  <span class="icon is-small">
+                    <i class="fas fa-undo"></i>
+                  </span>
+                  <span>Reaktivieren</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </form>
   </div>
   <div class="box" v-else>
@@ -250,11 +298,11 @@ import {
   validateTicket,
   reactivateTicket,
   flagTicketForDeletion,
-  stopTicketListener,
+  stopTicketListeners,
 } from "../store/firebase";
 import { useRouter } from "vue-router";
 import { onUnmounted } from "@vue/runtime-core";
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 export default {
   setup() {
     const router = useRouter();
@@ -264,12 +312,15 @@ export default {
     const deleteOperationLoading = ref(false);
     const validationOperationLoading = ref(false);
     const ticketId = router.currentRoute.value.params.id;
+    const form = reactive({
+      closingComment: "",
+    });
     loadTicket(ticketId).then(() => {
       loaded.value = true;
     });
     const ticket = getTicket();
     onUnmounted(() => {
-      stopTicketListener();
+      stopTicketListeners();
     });
     const submitDelete = async () => {
       deleteOperationLoading.value = true;
@@ -317,19 +368,19 @@ export default {
         "Das Ticket wird reaktiviert und landet wieder bei den Bearbeitern in der Inbox!"
       );
       if (result) {
-      await reactivateTicket(ticketId)
-        .then(
-          () => {
-            validationOperationLoading.value = false;
-          },
-          (error) => {
-            alert(error);
-            validationOperationLoading.value = false;
-          }
-        )
-        .catch((error) => {
-          console.log(error);
-        });
+        await reactivateTicket(ticketId)
+          .then(
+            () => {
+              validationOperationLoading.value = false;
+            },
+            (error) => {
+              alert(error);
+              validationOperationLoading.value = false;
+            }
+          )
+          .catch((error) => {
+            console.log(error);
+          });
       }
     };
     const flagForDeletion = async () => {
@@ -357,12 +408,15 @@ export default {
     };
     return {
       ticket,
+      form,
       loaded,
       userData,
       submitDelete,
       submitValidation,
       flagForDeletion,
-      submitReactivation
+      submitReactivation,
+      validationOperationLoading,
+      deleteOperationLoading
     };
   },
 };
