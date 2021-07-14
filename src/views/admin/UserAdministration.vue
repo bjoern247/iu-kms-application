@@ -1,6 +1,6 @@
 <template>
-  <div class="box">
-    <p class="title">Benutzerverwaltung</p>
+  <div class="box" v-if="dataReady">
+    <p class="title">Benutzerverwaltung <span v-if="user.deactivated" class="has-text-danger">(Benutzer ist gesperrt)</span></p>
     <form @submit.prevent="submitSave">
       <div class="columns">
         <div class="column is-7">
@@ -73,12 +73,14 @@
             <button
               class="button is-dark"
               type="button"
-              @click="submitDeactivation()"
+              :class="{ 'is-loading': saveOperationLoading }"
+              @click="toggleDeactivation()"
             >
               <span class="icon is-small">
                 <i class="fas fa-ban"></i>
               </span>
-              <span>Deaktivieren</span>
+              <span v-if="user.deactivated">Sperrung aufheben</span>
+              <span v-else>Sperren</span>
             </button>
           </div>
         </div>
@@ -87,20 +89,41 @@
     <p class="title mt-4 mb-2">Benutzertickets</p>
     <p class="is-size-5">Dieses Feature wurde noch nicht implementiert</p>
   </div>
+  <div class="box has-text-centered" v-else>
+        <div class="lds-roller">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
 </template>
 
 <script>
-import { getUser, updateUser } from "../../store/firebase";
+import {
+  loadUser,
+  getUser,
+  updateUser,
+  toggleUserDeactivation,
+} from "../../store/firebase";
 import { useRouter } from "vue-router";
-import { ref } from 'vue';
+import { ref } from "vue";
 export default {
   setup() {
     const router = useRouter();
+    const dataReady = ref(false);
+    loadUser(router.currentRoute.value.params.id).then(() => {
+      dataReady.value = true;
+    })
+    const user = getUser();
     const saveOperationLoading = ref(false);
-    const user = getUser(router.currentRoute.value.params.id);
     const submitSave = async () => {
       saveOperationLoading.value = true;
-      await updateUser(user.id, user.role).then(
+      await updateUser(user.value.uid, user.value.role).then(
         () => {
           saveOperationLoading.value = false;
           router.push("/user-overview");
@@ -110,14 +133,23 @@ export default {
         }
       );
     };
-    const submitDeactivation = async () => {
-      alert("Diese Funktion ist noch nicht implementiert!");
+    const toggleDeactivation = async () => {
+      saveOperationLoading.value = true;
+      await toggleUserDeactivation(user.value.uid).then(
+        () => {
+          saveOperationLoading.value = false;
+        },
+        () => {
+          saveOperationLoading.value = false;
+        }
+      );
     };
     return {
       user,
-      submitDeactivation,
+      toggleDeactivation,
       submitSave,
-      saveOperationLoading
+      saveOperationLoading,
+      dataReady
     };
   },
 };
