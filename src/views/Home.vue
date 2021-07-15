@@ -8,7 +8,7 @@
     >
       <div class="box has-text-centered">
         <h1 style="is-size-2">
-          Dein Account wurde deaktiviert, auf Grund missbräuchlichen Verhaltens
+          Dein Account wurde Grund missbräuchlichen Verhaltens deaktiviert.
         </h1>
         <div class="field mt-2">
           <p class="control">
