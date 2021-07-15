@@ -225,6 +225,74 @@ export const loadAllTickets = () => {
   })
 }
 
+// Admin: Filter: Closed, Loads all tickets into tickets variable
+export const loadAllTicketsFilterClosed = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  return new Promise((resolve) => {
+    const ticketsSubscriber = ticketCollection.where("ticketStatus", "==", "closed").onSnapshot(snapshot => {
+      tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(ticketsSubscriber);
+    return tickets
+  })
+}
+
+// Admin: Filter: Validated, Loads all tickets into tickets variable
+export const loadAllTicketsFilterValidated = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  return new Promise((resolve) => {
+    const ticketsSubscriber = ticketCollection.where("ticketStatus", "==", "validated").onSnapshot(snapshot => {
+      tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(ticketsSubscriber);
+    return tickets
+  })
+}
+
+// Admin: Filter: Created, Loads all tickets into tickets variable
+export const loadAllTicketsFilterCreated = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  return new Promise((resolve) => {
+    const ticketsSubscriber = ticketCollection.where("ticketStatus", "==", "created").onSnapshot(snapshot => {
+      tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(ticketsSubscriber);
+    return tickets
+  })
+}
+
+// Admin: Filter: In Deletion, Loads all tickets into tickets variable
+export const loadAllTicketsFilterDeletion = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  return new Promise((resolve) => {
+    const ticketsSubscriber = ticketCollection.where("ticketStatus", "==", "awaiting deletion").onSnapshot(snapshot => {
+      tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(ticketsSubscriber);
+    return tickets
+  })
+}
+
 // Editor: loads all tickets that are created in assigned courses and are not assigned yet
 export const loadUnassignedTickets = async () => {
   const courses = await getAssignedCourses(); // Editor's assigned courses
@@ -243,6 +311,11 @@ export const loadUnassignedTickets = async () => {
 
 // Editor: FILTER: LÖSCHUNG loads all tickets that are created in assigned courses and are not assigned yet
 export const loadUnassignedTicketsFilterLöschung = async () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
   const courses = await getAssignedCourses(); // Editor's assigned courses
   if (courses.length != 0) {
     console.log('Ticket Collection listener started');
@@ -258,7 +331,12 @@ export const loadUnassignedTicketsFilterLöschung = async () => {
 }
 
 // Editor: FILTER: In Prüfung loads all tickets that are created in assigned courses and are not assigned yet
-export const loadUnassignedTicketsFilterValidation = async () => {
+export const loadUnassignedTicketsFilterCreated = async () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
   const courses = await getAssignedCourses(); // Editor's assigned courses
   if (courses.length != 0) {
     console.log('Ticket Collection listener started');
@@ -277,7 +355,6 @@ export const loadUnassignedTicketsFilterValidation = async () => {
 export const loadAssignedTickets = async () => {
   const courses = await getAssignedCourses(); // Editor's assigned courses
   if (courses.length != 0) {
-    console.log('Ticket Collection listener started');
     return new Promise((resolve) => {
       const ticketsSubscriber = ticketCollection.where("courseId", "in", courses).where("ticketEditor", "==", state.userData.uid).onSnapshot(snapshot => {
         assignedTickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
@@ -294,9 +371,76 @@ export const loadAssignedTickets = async () => {
 
 // Student: Load all tickets created by user
 export const loadCreatedTickets = () => {
-  console.log('Ticket collection listener started');
   return new Promise((resolve) => {
     const ticketsSubscriber = ticketCollection.where("createdBy", "==", state.userData.uid).onSnapshot(snapshot => {
+      tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    }) // Query for all tickets created by specified user
+    subscribers.value.push(ticketsSubscriber);
+    return tickets
+  })
+}
+
+// Student: FILTER: created (in validation), Load all tickets created by user
+export const loadCreatedTicketsFilterCreated = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  return new Promise((resolve) => {
+    const ticketsSubscriber = ticketCollection.where("createdBy", "==", state.userData.uid).where("ticketStatus", "==", "created").onSnapshot(snapshot => {
+      tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    }) // Query for all tickets created by specified user
+    subscribers.value.push(ticketsSubscriber);
+    return tickets
+  })
+}
+
+// Student: FILTER: Awaiting deletion, Load all tickets created by user
+export const loadCreatedTicketsFilterDeletion = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  return new Promise((resolve) => {
+    const ticketsSubscriber = ticketCollection.where("createdBy", "==", state.userData.uid).where("ticketStatus", "==", "awaiting deletion").onSnapshot(snapshot => {
+      tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    }) // Query for all tickets created by specified user
+    subscribers.value.push(ticketsSubscriber);
+    return tickets
+  })
+}
+
+// Student: FILTER: validated (assigned), Load all tickets created by user
+export const loadCreatedTicketsFilterValidated = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  return new Promise((resolve) => {
+    const ticketsSubscriber = ticketCollection.where("createdBy", "==", state.userData.uid).where("ticketStatus", "==", "validated").onSnapshot(snapshot => {
+      tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    }) // Query for all tickets created by specified user
+    subscribers.value.push(ticketsSubscriber);
+    return tickets
+  })
+}
+
+// Student: FILTER: closed, Load all tickets created by user
+export const loadCreatedTicketsFilterClosed = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  return new Promise((resolve) => {
+    const ticketsSubscriber = ticketCollection.where("createdBy", "==", state.userData.uid).where("ticketStatus", "==", "closed").onSnapshot(snapshot => {
       tickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       resolve(true);
     }) // Query for all tickets created by specified user
