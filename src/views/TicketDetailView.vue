@@ -161,7 +161,12 @@
               </div>
             </div>
           </fieldset>
-          <div class="field mt-2" v-if="userData.role === 'student' && ticket.ticketStatus === 'created'">
+          <div
+            class="field mt-2"
+            v-if="
+              userData.role === 'student' && ticket.ticketStatus === 'created'
+            "
+          >
             <label class="label">Ticket-Option</label>
             <div class="control has-text-left">
               <legend>
@@ -534,6 +539,30 @@ export default {
           });
       }
     };
+    const submitDeleteStudent = async () => {
+      deleteOperationLoading.value = true;
+      const result = confirm(
+        "Das Ticket wird gelöscht. Diese Aktion und kann nicht mehr rückgängig gemacht werden!"
+      );
+      if (result) {
+        router.push("/ticket-overview");
+        await deleteTicket(ticketId)
+          .then(
+            () => {
+              deleteOperationLoading.value = false;
+            },
+            (error) => {
+              alert(error);
+              deleteOperationLoading.value = false;
+            }
+          )
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        deleteOperationLoading.value = false;
+      }
+    };
     return {
       ticket,
       form,
@@ -546,6 +575,7 @@ export default {
       validationOperationLoading,
       deleteOperationLoading,
       submitCloseTicket,
+      submitDeleteStudent,
     };
   },
 };
