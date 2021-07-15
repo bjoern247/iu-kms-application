@@ -828,7 +828,6 @@ COURSES
 
 // Admin: Load all courses from firestore
 export const loadAllCourses = () => {
-  console.log('Courses listener started');
   return new Promise((resolve) => {
     const coursesSubscriber = courseCollection.onSnapshot(snapshot => {
       courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
@@ -839,9 +838,25 @@ export const loadAllCourses = () => {
   })
 }
 
+// Admin: Filter: Without editor, Load all courses from firestore
+export const loadAllCoursesFilterWithoutEditor = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  return new Promise((resolve) => {
+    const coursesSubscriber = courseCollection.where("editors", "==", []).onSnapshot(snapshot => {
+      courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(coursesSubscriber);
+    return courses
+  })
+}
+
 // Editor: Load all assigned courses from firestore
 export const loadMyCourses = () => {
-  console.log('Courses listener started');
   return new Promise((resolve) => {
     const coursesSubscriber = courseCollection.where("editors", "array-contains", state.userData.uid).onSnapshot(snapshot => {
       courses.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))

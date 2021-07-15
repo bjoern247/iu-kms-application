@@ -61,22 +61,24 @@
       </div>
       <hr class="mb-0" />
       <p class="panel-tabs" v-if="userData.role === 'admin'">
-        <a class="is-active">Aktiv</a>
-        <a>Ohne Bearbeiter</a>
-        <a>Deaktiviert</a>
+        <a :class="{ 'is-active': showingAll }" @click="showAll()">Alle</a>
+        <a :class="{ 'is-active': showingWithoutEditor }" @click="showWithoutEditor()">Ohne Bearbeiter</a>
       </p>
     </div>
   </nav>
 </template>
 
 <script>
-import useFirebase, { getCourses } from "../../store/firebase";
+import useFirebase, { getCourses, loadAllCourses, loadAllCoursesFilterWithoutEditor } from "../../store/firebase";
 import { useRouter } from "vue-router";
+import { ref } from 'vue';
 export default {
   setup() {
     const courses = getCourses();
     const router = useRouter();
     const state = useFirebase();
+    const showingAll = ref(true);
+    const showingWithoutEditor = ref(false);
     const userData = state.userData.value;
     function editCourse(id) {
       router.push("/course-edit/"+id);
@@ -84,11 +86,25 @@ export default {
     function viewCourseDetails(id) {
       router.push("/course-detail-view/"+id);
     }
+    const showAll = () => {
+      showingAll.value = true;
+      showingWithoutEditor.value = false;
+      loadAllCourses();
+    }
+    const showWithoutEditor = () => {
+      showingAll.value = false;
+      showingWithoutEditor.value = true;
+      loadAllCoursesFilterWithoutEditor();
+    }
     return {
       courses,
       editCourse,
       userData,
-      viewCourseDetails
+      viewCourseDetails,
+      showingAll,
+      showingWithoutEditor,
+      showAll,
+      showWithoutEditor
     };
   },
 };
