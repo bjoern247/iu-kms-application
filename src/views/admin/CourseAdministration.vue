@@ -77,7 +77,7 @@
               </span>
               <span>Speichern</span>
             </button>
-            <button
+            <!-- <button
               class="button is-dark"
               type="button"
               @click="submitDeactivation()"
@@ -86,7 +86,7 @@
                 <i class="fas fa-comment-slash"></i>
               </span>
               <span>Deaktivieren</span>
-            </button>
+            </button> -->
             <button
               class="button is-danger"
               :class="{ 'is-loading': deleteOperationLoading }"

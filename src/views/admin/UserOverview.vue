@@ -110,7 +110,7 @@
           </div>
         </div>
       </div>
-      <hr class="mb-0" />
+      <hr class="mb-0 mt-0" />
       <p class="panel-tabs">
         <a :class="{ 'is-active': showingAll }" @click="showAll()">Alle</a>
         <a :class="{ 'is-active': showingStudents }" @click="showStudents()">Studenten</a>

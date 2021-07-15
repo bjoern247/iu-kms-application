@@ -297,7 +297,7 @@
       </div>
       <!-- Administratorbereich -->
       <div v-if="userData.role === 'admin'">
-        <p class="title mt-4">Administratorbereich</p>
+        <p class="title mt-4">Adminbereich</p>
         <div class="columns">
           <div class="column is-8">
             <div class="field" v-if="userData.role === 'admin'">
