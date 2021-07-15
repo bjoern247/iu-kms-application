@@ -127,15 +127,13 @@
           >
             <span>
               {{
-                ticket.datetime
-                  .toDate()
-                  .toLocaleDateString("de-DE", {
-                    day: "numeric",
-                    year: "numeric",
-                    month: "2-digit",
-                    hour: "numeric",
-                    minute: "numeric",
-                  })
+                ticket.datetime.toDate().toLocaleDateString("de-DE", {
+                  day: "numeric",
+                  year: "numeric",
+                  month: "2-digit",
+                  hour: "numeric",
+                  minute: "numeric",
+                })
               }}
             </span>
           </div>
@@ -162,12 +160,24 @@
       <hr class="mb-0" />
       <p class="panel-tabs">
         <a :class="{ 'is-active': showingAll }" @click="showAll()">Alle</a>
-        <a :class="{ 'is-active': inValidation }" @click="showInValidation()">In Prüfung</a>
-        <a :class="{ 'is-active': inDeletion }" @click="showInDeletion()"
+        <a :class="{ 'is-active': showingCreated }" @click="showInValidation()"
+          >In Prüfung</a
+        >
+        <a :class="{ 'is-active': showingDeletion }" @click="showInDeletion()"
           >Löschung</a
         >
-        <a v-if="userData.role === 'student'">In Bearbeitung</a>
-        <a v-if="userData.role === 'student'">Abgeschlossen</a>
+        <a
+          :class="{ 'is-active': showingValidated }"
+          v-if="userData.role === 'student' || userData.role === 'admin'"
+          @click="showValidated()"
+          >In Bearbeitung</a
+        >
+        <a
+          :class="{ 'is-active': showingClosed }"
+          v-if="userData.role === 'student' || userData.role === 'admin'"
+          @click="showClosed()"
+          >Abgeschlossen</a
+        >
       </p>
     </div>
   </nav>
@@ -176,9 +186,19 @@
 <script>
 import useFirebase, {
   getTickets,
+  loadAllTickets,
+  loadAllTicketsFilterClosed,
+  loadAllTicketsFilterCreated,
+  loadAllTicketsFilterDeletion,
+  loadAllTicketsFilterValidated,
+  loadCreatedTickets,
+  loadCreatedTicketsFilterClosed,
+  loadCreatedTicketsFilterCreated,
+  loadCreatedTicketsFilterDeletion,
+  loadCreatedTicketsFilterValidated,
   loadUnassignedTickets,
+  loadUnassignedTicketsFilterCreated,
   loadUnassignedTicketsFilterLöschung,
-  loadUnassignedTicketsFilterValidation
 } from "../store/firebase";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
@@ -189,33 +209,77 @@ export default {
     const state = useFirebase();
     const userData = state.userData.value;
     const showingAll = ref(true);
-    const inDeletion = ref(false);
-    const inValidation = ref(false);
+    const showingClosed = ref(false);
+    const showingValidated = ref(false);
+    const showingDeletion = ref(false);
+    const showingCreated = ref(false);
     function showTicket(id) {
       router.push("/ticket-detail-view/" + id);
     }
     const showInDeletion = () => {
+      showingAll.value = false;
+      showingCreated.value = false;
+      showingDeletion.value = true;
+      showingValidated.value = false;
+      showingClosed.value = false;
       if (userData.role === "editor") {
         loadUnassignedTicketsFilterLöschung();
-        showingAll.value = false;
-        inValidation.value = false;
-        inDeletion.value = true;
-      }
+      } else if (userData.role === "student") {
+        loadCreatedTicketsFilterDeletion();
+      } else if (userData.role === 'admin') {
+        loadAllTicketsFilterDeletion();
+      } 
     };
     const showInValidation = () => {
+      showingAll.value = false;
+      showingCreated.value = true;
+      showingDeletion.value = false;
+      showingValidated.value = false;
+      showingClosed.value = false;
       if (userData.role === "editor") {
-        loadUnassignedTicketsFilterValidation();
-        showingAll.value = false;
-        inValidation.value = true;
-        inDeletion.value = false;
+        loadUnassignedTicketsFilterCreated();
+      } else if (userData.role === "student") {
+        loadCreatedTicketsFilterCreated();
+      } else if (userData.role === 'admin') {
+        loadAllTicketsFilterCreated();
+      } 
+    };
+    const showValidated = () => {
+      showingAll.value = false;
+      showingCreated.value = false;
+      showingDeletion.value = false;
+      showingValidated.value = true;
+      showingClosed.value = false;
+      if (userData.role === "student") {
+        loadCreatedTicketsFilterValidated();
+      } else if (userData.role === 'admin') {
+        loadAllTicketsFilterValidated();
+      }
+    };
+    const showClosed = () => {
+      showingAll.value = false;
+      showingCreated.value = false;
+      showingDeletion.value = false;
+      showingValidated.value = false;
+      showingClosed.value = true;
+      if (userData.role === "student") {
+        loadCreatedTicketsFilterClosed();
+      } else if (userData.role === 'admin') {
+        loadAllTicketsFilterClosed();
       }
     };
     const showAll = () => {
+      showingAll.value = true;
+      showingCreated.value = false;
+      showingDeletion.value = false;
+      showingValidated.value = false;
+      showingClosed.value = false;
       if (userData.role === "editor") {
-        showingAll.value = true;
-        inValidation.value = false;
-        inDeletion.value = false;
         loadUnassignedTickets();
+      } else if (userData.role === "student") {
+        loadCreatedTickets();
+      } else if (userData.role === 'admin') {
+        loadAllTickets();
       }
     };
     return {
@@ -223,11 +287,15 @@ export default {
       userData,
       showTicket,
       showInDeletion,
-      inDeletion,
       showingAll,
-      inValidation,
+      showingDeletion,
+      showingValidated,
       showAll,
       showInValidation,
+      showingCreated,
+      showingClosed,
+      showClosed,
+      showValidated,
     };
   },
 };
