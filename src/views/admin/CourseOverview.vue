@@ -108,7 +108,7 @@
           </div>
         </div>
       </div>
-      <hr class="mb-0 mt-3" />
+      <hr class="mb-0 mt-0" />
       <p class="panel-tabs" v-if="userData.role === 'admin'">
         <a :class="{ 'is-active': showingAll }" @click="showAll()">Alle</a>
         <a

@@ -86,8 +86,8 @@
         </div>
       </div>
     </form>
-    <p class="title mt-4 mb-2">Benutzertickets</p>
-    <p class="is-size-5">Dieses Feature wurde noch nicht implementiert</p>
+    <!-- <p class="title mt-4 mb-2">Benutzertickets</p>
+    <p class="is-size-5">Dieses Feature wurde noch nicht implementiert</p> -->
   </div>
   <div class="box has-text-centered" v-else>
         <div class="lds-roller">
