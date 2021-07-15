@@ -21,7 +21,7 @@
       "
     >
       Das Ticket wurde zur Löschung vorgemerkt und wird bald gelöscht. Wenn dies
-      nicht richtig ist erstelle ein neues Ticket mit genaueren Informationen
+      nicht richtig ist, erstelle ein neues Ticket mit genaueren Informationen
       oder melde dich bei deinem Tutor.
     </p>
     <p
