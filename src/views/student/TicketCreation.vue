@@ -66,6 +66,7 @@
                 class="button is-primary"
                 :class="{ 'is-loading': loading }"
                 type="submit"
+                :disabled="(form.ticketName.length < 3) || (form.ticketText.length < 7)"
               >
                 <span class="icon is-small">
                   <i class="fas fa-save"></i>
