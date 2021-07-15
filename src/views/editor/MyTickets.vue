@@ -85,12 +85,12 @@
             >
             <span
               v-else-if="ticket.ticketStatus === 'validated'"
-              class="tag is-medium is-success"
+              class="tag is-medium is-warning"
               >In Bearbeitung</span
             >
             <span
               v-else-if="ticket.ticketStatus === 'closed'"
-              class="tag is-medium is-dark"
+              class="tag is-medium is-success"
               >Abgeschlossen</span
             >
             <span

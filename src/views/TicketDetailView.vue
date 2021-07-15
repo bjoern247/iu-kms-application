@@ -470,9 +470,12 @@ export default {
           .catch((error) => {
             console.log(error);
           });
+      } else {
+        validationOperationLoading.value = false;
       }
     };
     const flagForDeletion = async () => {
+      validationOperationLoading.value = true;
       const result = confirm(
         "Die Beantragung zur Löschung kann nicht rückgängig gemacht werden!"
       );
@@ -480,18 +483,18 @@ export default {
         await flagTicketForDeletion(ticketId)
           .then(
             () => {
-              deleteOperationLoading.value = false;
+              validationOperationLoading.value = false;
             },
             (error) => {
               alert(error);
-              deleteOperationLoading.value = false;
+              validationOperationLoading.value = false;
             }
           )
           .catch((error) => {
             console.log(error);
           });
       } else {
-        deleteOperationLoading.value = false;
+        validationOperationLoading.value = false;
       }
     };
     const submitCloseTicket = async () => {

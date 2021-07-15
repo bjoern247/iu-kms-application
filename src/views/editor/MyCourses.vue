@@ -50,7 +50,7 @@
               is-one-quarter-mobile
             "
           >
-            <span class="tag is-dark is-medium">{{ course.courseId }}</span>
+            <span class="tag is-info is-medium">{{ course.courseId }}</span>
           </div>
           <div
             class="

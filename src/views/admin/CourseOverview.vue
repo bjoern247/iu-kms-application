@@ -1,7 +1,7 @@
 <template>
   <nav class="panel is-primary">
     <p class="panel-heading">Kursübersicht</p>
-    <div class="box p-0 pb-">
+    <div class="box p-0">
       <div
         class="columns is-mobile is-centered mt-2 mb-0 mr-0 ml-0"
         style="background-color: whitesmoke; border-bottom: 1px solid lightgrey"
@@ -16,7 +16,7 @@
             is-one-quarter-mobile
           "
         >
-          <span class="ml-2">Kürzel</span>
+          Kürzel
         </div>
         <div
           class="
@@ -24,7 +24,7 @@
             is-8-desktop is-8-tablet is-8-widescreen is-8-fullhd is-half-mobile
           "
         >
-          <span class="ml-2">Name</span>
+          Name
         </div>
         <div
           class="
@@ -39,7 +39,7 @@
         ></div>
       </div>
       <div v-for="course in courses" :key="course.id" class="row">
-        <div class="columns is-mobile is-centered is-vcentered mt-1 pr-4 pl-4">
+        <div class="columns is-mobile is-centered is-vcentered mb-0 mt-0 mr-0 ml-0">
           <div
             class="
               column
@@ -50,7 +50,7 @@
               is-one-quarter-mobile
             "
           >
-            <span class="tag is-dark is-medium">{{ course.courseId }}</span>
+            <span class="tag is-info is-medium">{{ course.courseId }}</span>
           </div>
           <div
             class="
