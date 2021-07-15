@@ -1,6 +1,11 @@
 <template>
   <div class="box" v-if="dataReady">
-    <p class="title">Benutzerverwaltung <span v-if="user.deactivated" class="has-text-danger">(Benutzer ist gesperrt)</span></p>
+    <p class="title">
+      Benutzerverwaltung
+      <span v-if="user.deactivated" class="has-text-danger"
+        >(Benutzer ist gesperrt)</span
+      >
+    </p>
     <form @submit.prevent="submitSave">
       <div class="columns">
         <div class="column is-7">
@@ -32,9 +37,13 @@
         <div class="column is-5">
           <div class="field">
             <label class="label">Rolle</label>
+
             <div class="control has-icons-right">
               <div class="select">
-                <select v-model="user.role">
+                <select
+                  v-model="user.role"
+                  :disabled="userData.uid === user.uid"
+                >
                   <option>student</option>
                   <option>editor</option>
                   <option>admin</option>
@@ -64,6 +73,7 @@
               class="button is-primary"
               :class="{ 'is-loading': saveOperationLoading }"
               type="submit"
+              :disabled="userData.uid === user.uid"
             >
               <span class="icon is-small">
                 <i class="fas fa-save"></i>
@@ -75,6 +85,7 @@
               type="button"
               :class="{ 'is-loading': saveOperationLoading }"
               @click="toggleDeactivation()"
+              :disabled="userData.uid === user.uid"
             >
               <span class="icon is-small">
                 <i class="fas fa-ban"></i>
@@ -90,17 +101,17 @@
     <p class="is-size-5">Dieses Feature wurde noch nicht implementiert</p> -->
   </div>
   <div class="box has-text-centered" v-else>
-        <div class="lds-roller">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      </div>
+    <div class="lds-roller">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -109,6 +120,7 @@ import {
   getUser,
   updateUser,
   toggleUserDeactivation,
+  getUserData,
 } from "../../store/firebase";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
@@ -118,7 +130,8 @@ export default {
     const dataReady = ref(false);
     loadUser(router.currentRoute.value.params.id).then(() => {
       dataReady.value = true;
-    })
+    });
+    const userData = getUserData();
     const user = getUser();
     const saveOperationLoading = ref(false);
     const submitSave = async () => {
@@ -146,10 +159,11 @@ export default {
     };
     return {
       user,
+      userData,
       toggleDeactivation,
       submitSave,
       saveOperationLoading,
-      dataReady
+      dataReady,
     };
   },
 };

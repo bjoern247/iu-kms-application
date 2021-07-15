@@ -33,12 +33,14 @@
           <div class="field">
             <label class="label">Kurskürzel</label>
             <div class="control has-icons-right">
-              <input
-                class="input"
-                type="text"
-                v-model="course.courseId"
-                placeholder="Kürzel"
-              />
+              <fieldset disabled>
+                <input
+                  class="input"
+                  type="text"
+                  :value="course.courseId"
+                  placeholder="Kürzel"
+                />
+              </fieldset>
               <span v-if="false" class="icon is-small is-right">
                 <i class="fas fa-check"></i>
               </span>
@@ -111,7 +113,7 @@ import {
   updateCourse,
   deleteCourse,
   getAssignedEditors,
-  startCourseListeners
+  startCourseListeners,
 } from "../../store/firebase";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
@@ -162,7 +164,6 @@ export default {
       router.push("/course-editors/" + id);
     };
     const nameWithComma = (name, index) => {
-
       if (index !== assignedEditors.value.length - 1) {
         return name + "," + " ";
       } else {
@@ -178,7 +179,7 @@ export default {
       submitDeactivation,
       changeCourseEditors,
       assignedEditors,
-      nameWithComma
+      nameWithComma,
     };
   },
 };

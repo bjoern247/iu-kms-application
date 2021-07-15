@@ -161,6 +161,23 @@
               </div>
             </div>
           </fieldset>
+          <div class="field mt-2" v-if="userData.role === 'student' && ticket.ticketStatus === 'created'">
+            <label class="label">Ticket-Option</label>
+            <div class="control has-text-left">
+              <legend>
+                <button
+                  class="button is-danger"
+                  type="submit"
+                  @click="submitDeleteStudent()"
+                >
+                  <span class="icon is-small">
+                    <i class="fas fa-trash"></i>
+                  </span>
+                  <span>Ticket löschen</span>
+                </button>
+              </legend>
+            </div>
+          </div>
         </div>
       </div>
       <hr v-if="ticket.ticketStatus === 'closed'" />

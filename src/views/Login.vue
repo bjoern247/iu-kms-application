@@ -70,7 +70,13 @@ export default {
           loading.value = false;
         })
         .catch((err) => {
-          alert(err.message);
+          if (err.code == 'auth/invalid-email') {
+            alert('Die E-Mail Adresse ist falsch formatiert, bitte überprüfe die eingegeben E-Mail-Adresse!');
+          } else if (err.code == 'auth/wrong-password') {
+            alert('Diese E-Mail / Password Kombination ist uns nicht bekannt. Bitte überprüfe beide Felder oder lasse dir einen Account erstellen!');
+          } else {
+            alert('Beim Einloggen ist ein Fehler aufgetreten. Fehler: '+err.code+'! Bitte wende dich an den Support!');
+          }
           loading.value = false;
         });
     }
