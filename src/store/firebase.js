@@ -366,6 +366,46 @@ export const loadAssignedTickets = async () => {
   }
 }
 
+// Editor: Filter: Validated; loads assigned tickets
+export const loadAssignedTicketsFilterValidated = async () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  const courses = await getAssignedCourses(); // Editor's assigned courses
+  if (courses.length != 0) {
+    return new Promise((resolve) => {
+      const ticketsSubscriber = ticketCollection.where("courseId", "in", courses).where("ticketEditor", "==", state.userData.uid).where("ticketStatus", "==", "validated").onSnapshot(snapshot => {
+        assignedTickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        resolve(true);
+      }) // Query for all tickets in courses that Editor has assigned to himself
+      subscribers.value.push(ticketsSubscriber);
+      return assignedTickets
+    })
+  }
+}
+
+// Editor: Filter: Closed; loads assigned tickets
+export const loadAssignedTicketsFilterClosed = async () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  const courses = await getAssignedCourses(); // Editor's assigned courses
+  if (courses.length != 0) {
+    return new Promise((resolve) => {
+      const ticketsSubscriber = ticketCollection.where("courseId", "in", courses).where("ticketEditor", "==", state.userData.uid).where("ticketStatus", "==", "closed").onSnapshot(snapshot => {
+        assignedTickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        resolve(true);
+      }) // Query for all tickets in courses that Editor has assigned to himself
+      subscribers.value.push(ticketsSubscriber);
+      return assignedTickets
+    })
+  }
+}
+
 
 
 
@@ -765,10 +805,8 @@ export const getCourses = () => {
 
 // Returns assigned courses for editors
 export const getAssignedCourses = () => {
-  console.log("getting assigned courses");
   return new Promise((resolve) => {
     userCollection.doc(state.userData.uid).get().then((doc) => {
-      console.log(doc.data().courses);
       resolve(doc.data().courses);
     });
   })
@@ -776,8 +814,6 @@ export const getAssignedCourses = () => {
 
 export const getCourse = (id) => {
   // realtime updates not needed here (ticket is different)
-  console.log("getCourse()");
-  console.log(courses.value);
   const course = courses.value.filter((item) => {
     return item.id === id
   })
