@@ -1,14 +1,7 @@
 <template>
   <nav class="panel is-primary">
-    <p class="panel-heading">Ticketübersicht</p>
-    <div class="panel-block">
-      <p class="control has-icons-left">
-        <input class="input" type="text" placeholder="Search" />
-        <span class="icon is-left">
-          <i class="fas fa-search" aria-hidden="true"></i>
-        </span>
-      </p>
-    </div>
+    <p v-if="userData.role === 'admin' || userData.role === 'student'" class="panel-heading">Ticketübersicht</p>
+    <p v-else class="panel-heading">Ticket-Inbox</p>
     <div class="box p-0">
       <div
         class="columns is-mobile is-centered mt-2 mb-0 mr-0 ml-0"
@@ -155,16 +148,15 @@
             </div>
           </div>
         </div>
-        <hr class="m-0" />
       </div>
-      <hr class="mb-0" />
+      <hr class="mb-0 mt-0" />
       <p class="panel-tabs">
         <a :class="{ 'is-active': showingAll }" @click="showAll()">Alle</a>
         <a :class="{ 'is-active': showingCreated }" @click="showInValidation()"
           >In Prüfung</a
         >
         <a :class="{ 'is-active': showingDeletion }" @click="showInDeletion()"
-          >Löschung</a
+          >In Löschung</a
         >
         <a
           :class="{ 'is-active': showingValidated }"

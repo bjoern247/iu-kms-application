@@ -1,14 +1,6 @@
 <template>
   <nav class="panel is-primary">
     <p class="panel-heading">Nutzerübersicht</p>
-    <div class="panel-block">
-      <p class="control has-icons-left">
-        <input class="input" type="text" placeholder="Search" />
-        <span class="icon is-left">
-          <i class="fas fa-search" aria-hidden="true"></i>
-        </span>
-      </p>
-    </div>
     <div class="box p-0">
       <div
         class="columns is-mobile is-centered mt-2 mb-0 mr-0 ml-0"
