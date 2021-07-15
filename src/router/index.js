@@ -204,7 +204,6 @@ router.beforeEach((to, from, next) => {
   const adminOnly = to.matched.some(record => record.meta.adminOnly);
   if (requiresAuth) {
     if (state.user.value !== null) {
-      console.log(userData.role);
       if (editorOnly) {
         if (userData.role === 'editor' || userData.role === 'admin') {
           next();

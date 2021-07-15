@@ -120,29 +120,69 @@
       </div>
       <hr class="mb-0" />
       <p class="panel-tabs">
-        <a class="is-active">Alle</a>
-        <a>Studenten</a>
-        <a>Ticketbearbeiter</a>
-        <a>Administratoren</a>
+        <a :class="{ 'is-active': showingAll }" @click="showAll()">Alle</a>
+        <a :class="{ 'is-active': showingStudents }" @click="showStudents()">Studenten</a>
+        <a :class="{ 'is-active': showingEditors }" @click="showEditors()">Ticketbearbeiter</a>
+        <a :class="{ 'is-active': showingAdmins }" @click="showAdmins()">Administratoren</a>
       </p>
     </div>
   </nav>
 </template>
 
 <script>
-import { getUsers } from "../../store/firebase";
+import { getUsers, loadUsers, loadUsersFilterAdmins, loadUsersFilterEditors, loadUsersFilterStudents } from "../../store/firebase";
 import { useRouter } from "vue-router";
+import { ref } from 'vue';
 export default {
   setup() {
     const router = useRouter();
     const users = getUsers();
+    const showingAll = ref(true);
+    const showingStudents = ref(false);
+    const showingEditors = ref(false);
+    const showingAdmins = ref(false);
     function editUser(id) {
       router.push("/user-detail-view/" + id);
     }
-    // console.log(courses);
+    const showAll = () => {
+      showingAll.value = true;
+      showingStudents.value = false;
+      showingEditors.value = false;
+      showingAdmins.value = false;
+      loadUsers();
+    }
+    const showStudents = () => {
+      showingAll.value = false;
+      showingStudents.value = true;
+      showingEditors.value = false;
+      showingAdmins.value = false;
+      loadUsersFilterStudents();
+    }
+    const showEditors = () => {
+      showingAll.value = false;
+      showingStudents.value = false;
+      showingEditors.value = true;
+      showingAdmins.value = false;
+      loadUsersFilterEditors();
+    }
+    const showAdmins = () => {
+      showingAll.value = false;
+      showingStudents.value = false;
+      showingEditors.value = false;
+      showingAdmins.value = true;
+      loadUsersFilterAdmins();
+    }
     return {
       editUser,
       users,
+      showingAll,
+      showingAdmins,
+      showingEditors,
+      showingStudents,
+      showAll,
+      showStudents,
+      showEditors,
+      showAdmins
     };
   },
 };

@@ -144,6 +144,60 @@ export const loadUsers = () => {
   })
 }
 
+// Admin: Filter: Admins, Load all users from firestore
+export const loadUsersFilterAdmins = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  console.log('Users listener started');
+  return new Promise((resolve) => {
+    const usersSubscriber = userCollection.where("role", "==", "admin").onSnapshot(snapshot => {
+      users.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(usersSubscriber);
+    return users
+  })
+}
+
+// Admin: Filter: Students, Load all users from firestore
+export const loadUsersFilterStudents = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  console.log('Users listener started');
+  return new Promise((resolve) => {
+    const usersSubscriber = userCollection.where("role", "==", "student").onSnapshot(snapshot => {
+      users.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(usersSubscriber);
+    return users
+  })
+}
+
+// Admin: Filter: Editors, Load all users from firestore
+export const loadUsersFilterEditors = () => {
+  if (subscribers.value.length > 25) {
+    console.log('Detaching unused realtime listeners')
+    subscribers.value.forEach(subscriber => subscriber());
+    subscribers.value = [];
+  }
+  console.log('Users listener started');
+  return new Promise((resolve) => {
+    const usersSubscriber = userCollection.where("role", "==", "editor").onSnapshot(snapshot => {
+      users.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      resolve(true);
+    })
+    subscribers.value.push(usersSubscriber);
+    return users
+  })
+}
+
 // Admin: Load specific user from firestore
 export const loadUser = (id) => {
   console.log('Specific user listener started');
