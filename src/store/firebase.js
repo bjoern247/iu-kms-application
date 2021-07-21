@@ -49,7 +49,8 @@ const state = reactive({
 // Ticket State Object
 const studentTicketState = reactive({
   created: null,
-  validated: null
+  validated: null,
+  response: null
 });
 
 const editorTicketState = reactive({
@@ -603,6 +604,17 @@ export const getStudentAmountValidated = () => {
     return null;
   })
 }
+export const getStudentAmountResponse = () => {
+  return new Promise((resolve) => {
+    const ticketStudentAmountResponseListener = ticketCollection.where("createdBy", "==", state.userData.uid).where("ticketStatus", "==", "response").onSnapshot(snapshot => {
+      const response = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      studentTicketState.response = response.length
+      resolve(true);
+    }) // Query for all tickets created by specified user
+    subscribers.value.push(ticketStudentAmountResponseListener);
+    return null;
+  })
+}
 export const getEditorAmountCreated = async () => {
   const courses = await getAssignedCourses(); // Editor's assigned courses
   if (courses.length != 0) {
@@ -690,7 +702,8 @@ export const createTicket = async (name, text, category, courseId) => {
   const docId = await getCourseDocById(courseId);
   console.log(docId);
   return new Promise((resolve, reject) => {
-    ticketCollection.doc().set({
+    let newTicketRef = ticketCollection.doc()
+    newTicketRef.set({
       ticketName: name,
       ticketText: text,
       ticketCategory: category,
@@ -744,7 +757,7 @@ export const validateTicket = (id) => {
   })
 }
 
-// Close ticket (last step in ticket lifecycle)
+// Editor: Close ticket (last step in ticket lifecycle)
 export const closeTicket = (id, comment) => {
   return new Promise((resolve, reject) => {
     ticketCollection.doc(id).update({
@@ -758,6 +771,52 @@ export const closeTicket = (id, comment) => {
         minute: 'numeric',
       })),
       ticketClosingComment: comment
+    }).then(() => {
+      resolve(true);
+    }).catch((error) => {
+      alert(error);
+      reject(error);
+    });
+  })
+}
+
+// Editor: Ask student to specify more details (step in ticket lifecycle)
+export const respondStudent = (id, comment) => {
+  return new Promise((resolve, reject) => {
+    ticketCollection.doc(id).update({
+      ticketStatus: 'response',
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('Ticket Rückfrage: ' + new Date().toLocaleDateString('de-DE', {
+        day: 'numeric',
+        year: 'numeric',
+        month: '2-digit',
+        hour: 'numeric',
+        minute: 'numeric',
+      })),
+      ticketResponseComment: comment,
+      ticketQuestionDate: new Date()
+    }).then(() => {
+      resolve(true);
+    }).catch((error) => {
+      alert(error);
+      reject(error);
+    });
+  })
+}
+
+// Student: Students' response to an editors' question (step in ticket lifecycle)
+export const respondEditor = (id, comment) => {
+  return new Promise((resolve, reject) => {
+    ticketCollection.doc(id).update({
+      ticketStatus: 'validated',
+      ticketLog: firebase.firestore.FieldValue.arrayUnion('Rückfrage beantwortet: ' + new Date().toLocaleDateString('de-DE', {
+        day: 'numeric',
+        year: 'numeric',
+        month: '2-digit',
+        hour: 'numeric',
+        minute: 'numeric',
+      })),
+      ticketText: comment,
+      ticketQuestionResponseDate: new Date()
     }).then(() => {
       resolve(true);
     }).catch((error) => {
@@ -1037,6 +1096,7 @@ export const startAllListeners = async () => {
     await loadCreatedTickets();
     getStudentAmountCreated(); // realtime created tickets number for student home view
     getStudentAmountValidated(); // realtime validated tickets number for student home view
+    getStudentAmountResponse(); // realtime in-response ticket number 
   }
 }
 

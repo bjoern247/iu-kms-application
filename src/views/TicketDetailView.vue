@@ -98,6 +98,17 @@
                 ></textarea>
               </div>
             </div>
+            <div class="field" v-if="ticket.ticketResponseComment && ticket.ticketStatus === 'response'">
+              <label class="label">Rückfrage-Kommentar</label>
+              <div class="control">
+                <textarea
+                  v-model="ticket.ticketResponseComment"
+                  class="textarea"
+                  type="text"
+                  placeholder="Error-732"
+                ></textarea>
+              </div>
+            </div>
           </fieldset>
         </div>
         <div class="column is-4">
@@ -149,6 +160,11 @@
                   >In Bearbeitung</span
                 >
                 <span
+                  v-else-if="ticket.ticketStatus === 'response'"
+                  class="tag is-medium is-danger"
+                  >Rückfrage ausstehend</span
+                >
+                <span
                   v-else-if="ticket.ticketStatus === 'closed'"
                   class="tag is-medium is-success"
                   >Abgeschlossen</span
@@ -158,6 +174,25 @@
                   class="tag is-medium is-danger"
                   >Löschung im Gange</span
                 >
+              </div>
+            </div>
+            <div class="field" v-if="ticket.ticketQuestionResponseDate">
+              <label class="label">Ticket überarbeitet am</label>
+              <div class="control">
+                <input
+                  class="input"
+                  type="text"
+                  :value="
+                    ticket.ticketQuestionResponseDate.toDate().toLocaleDateString('de-DE', {
+                      day: 'numeric',
+                      year: 'numeric',
+                      month: '2-digit',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                    })
+                  "
+                  placeholder="Error-732"
+                />
               </div>
             </div>
           </fieldset>
@@ -251,9 +286,21 @@
         <p class="title mt-4">Ticketbearbeitung</p>
         <div class="columns">
           <div class="column is-8">
+            <div class="field">
+              <label class="label">Ticket-Log</label>
+              <div class="control">
+                <fieldset disabled>
+                  <div v-for="element in ticket.ticketLog" :key="element">
+                    <ul>
+                      <li>- {{ element }}</li>
+                    </ul>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
             <form @submit.prevent="onSubmit">
               <div class="field">
-                <label class="label">Abschluß-Kommentar</label>
+                <label class="label">Abschluß-Kommentar / Rückfrage</label>
                 <div class="control">
                   <textarea
                     v-model="form.closingComment"
@@ -263,16 +310,28 @@
                 </div>
               </div>
               <div class="field">
-                <div class="control">
+                <div class="control buttons">
                   <button
                     class="button is-success"
                     type="submit"
                     @click="submitCloseTicket()"
+                    :disabled="form.closingComment.length < 7"
                   >
                     <span class="icon is-small">
-                      <i class="fas fa-save"></i>
+                      <i class="far fa-check-circle"></i>
                     </span>
                     <span>Ticket schließen</span>
+                  </button>
+                  <button
+                    class="button is-warning"
+                    type="submit"
+                    @click="submitQuestion()"
+                    :disabled="form.closingComment.length < 7"
+                  >
+                    <span class="icon is-small">
+                      <i class="fas fa-question"></i>
+                    </span>
+                    <span>Rückfrage senden</span>
                   </button>
                 </div>
               </div>
@@ -287,6 +346,18 @@
         <p class="title mt-4">Ticketprüfung</p>
         <div class="columns">
           <div class="column is-8">
+            <div class="field">
+              <label class="label">Ticket-Log</label>
+              <div class="control">
+                <fieldset disabled>
+                  <div v-for="element in ticket.ticketLog" :key="element">
+                    <ul>
+                      <li>- {{ element }}</li>
+                    </ul>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
             <div class="field">
               <label class="label">Prüfungs-Optionen</label>
               <div class="control buttons">
@@ -317,12 +388,71 @@
           </div>
         </div>
       </div>
+      <!-- Ticket-Rückfrage Editor -->
+      <div
+        v-if="userData.role === 'editor' && ticket.ticketStatus === 'response'"
+      >
+        <p class="title mt-4">Ticketbearbeitung</p>
+        <div class="columns">
+          <div class="column is-8">
+            <div class="field">
+              <label class="label">Ticket-Log</label>
+              <div class="control">
+                <fieldset disabled>
+                  <div v-for="element in ticket.ticketLog" :key="element">
+                    <ul>
+                      <li>- {{ element }}</li>
+                    </ul>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Ticket-Rückfrage Student -->
+      <div
+        v-if="userData.role === 'student' && ticket.ticketStatus === 'response'"
+      >
+        <p class="title mt-4">Rückfrage beantworten</p>
+        <div class="columns">
+          <div class="column is-8">
+            <form @submit.prevent="onSubmit">
+              <div class="field">
+                <label class="label">Ticket-Text überarbeiten</label>
+                <div class="control">
+                  <textarea
+                    v-model="form.closingComment"
+                    class="textarea"
+                    :placeholder="ticket.ticketText"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="field">
+                <div class="control buttons">
+                  <button
+                    class="button is-warning"
+                    type="submit"
+                    @click="submitResponse()"
+                    :disabled="form.closingComment.length < 7"
+                  >
+                    <span class="icon is-small">
+                      <i class="far fa-check-circle"></i>
+                    </span>
+                    <span>Rückfrage abschließen</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
       <!-- Administratorbereich -->
       <div v-if="userData.role === 'admin'">
         <p class="title mt-4">Adminbereich</p>
         <div class="columns">
           <div class="column is-8">
-            <div class="field" v-if="userData.role === 'admin'">
+            <div class="field">
               <label class="label">Ticket-Log</label>
               <div class="control">
                 <fieldset disabled>
@@ -410,6 +540,8 @@ import {
   flagTicketForDeletion,
   stopTicketListeners,
   closeTicket,
+  respondStudent,
+  respondEditor,
 } from "../store/firebase";
 import { useRouter } from "vue-router";
 import { onUnmounted } from "@vue/runtime-core";
@@ -423,15 +555,15 @@ export default {
     const deleteOperationLoading = ref(false);
     const validationOperationLoading = ref(false);
     const ticketId = router.currentRoute.value.params.id;
-    const form = reactive({
-      closingComment: "",
-    });
     loadTicket(ticketId).then(() => {
       loaded.value = true;
     });
     const ticket = getTicket();
     onUnmounted(() => {
       stopTicketListeners();
+    });
+    const form = reactive({
+      closingComment: "",
     });
     const submitDelete = async () => {
       deleteOperationLoading.value = true;
@@ -539,6 +671,36 @@ export default {
           });
       }
     };
+    const submitQuestion = async () => {
+      await respondStudent(ticketId, form.closingComment)
+        .then(
+          () => {
+            router.push("/assigned-tickets");
+            form.closingComment = "";
+          },
+          (error) => {
+            alert(error);
+          }
+        )
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+    const submitResponse = async () => {
+      await respondEditor(ticketId, form.closingComment)
+        .then(
+          () => {
+            router.push("/ticket-overview");
+            form.closingComment = "";
+          },
+          (error) => {
+            alert(error);
+          }
+        )
+        .catch((error) => {
+          console.log(error);
+        });
+    };
     const submitDeleteStudent = async () => {
       deleteOperationLoading.value = true;
       const result = confirm(
@@ -576,6 +738,8 @@ export default {
       deleteOperationLoading,
       submitCloseTicket,
       submitDeleteStudent,
+      submitQuestion,
+      submitResponse
     };
   },
 };

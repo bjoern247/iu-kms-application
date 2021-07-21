@@ -102,6 +102,11 @@
               >Abgeschlossen</span
             >
             <span
+              v-else-if="ticket.ticketStatus === 'response'"
+              class="tag is-medium is-danger"
+              >Rückfrage</span
+            >
+            <span
               v-else-if="ticket.ticketStatus === 'awaiting deletion'"
               class="tag is-medium is-danger"
               >Löschung</span

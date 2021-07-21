@@ -1,11 +1,29 @@
 <template>
   <div class="columns is-centered is-vcentered">
     <div
-      class="column is-half-desktop is-one-third-widescreen is-one-quarter-fullhd"
+      class="
+        column
+        is-half-desktop is-one-third-widescreen is-one-quarter-fullhd
+      "
     >
       <div class="box">
         <p class="title">Tickets</p>
-        <p class="subtitle">In Prüfung <span class="tag is-rounded is-warning">{{ticketData.created}}</span> In Bearbeitung <span class="tag is-rounded is-success">{{ticketData.validated}}</span> </p>
+        <p class="subtitle" v-if="ticketData.response > 0">
+          Rückfrage
+          <span class="tag is-rounded is-danger">{{
+            ticketData.response
+          }}</span>
+        </p>
+        <p class="subtitle" v-else>
+          In Prüfung
+          <span class="tag is-rounded is-warning">{{
+            ticketData.created
+          }}</span>
+          In Bearbeitung
+          <span class="tag is-rounded is-success">{{
+            ticketData.validated
+          }}</span>
+        </p>
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">
@@ -39,7 +57,10 @@
       </div>
     </div>
     <div
-      class="column is-half-desktop is-one-third-widescreen is-one-quarter-fullhd"
+      class="
+        column
+        is-half-desktop is-one-third-widescreen is-one-quarter-fullhd
+      "
     >
       <div class="box">
         <p class="title">Konto</p>
@@ -64,7 +85,11 @@
 </template>
 
 <script>
-import useFirebaseAuth, { getTickets, getUserData, getStudentTicketState } from "../../store/firebase";
+import useFirebaseAuth, {
+  getTickets,
+  getUserData,
+  getStudentTicketState,
+} from "../../store/firebase";
 export default {
   name: "StudentView",
   setup() {

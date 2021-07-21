@@ -89,6 +89,11 @@
               >In Bearbeitung</span
             >
             <span
+              v-else-if="ticket.ticketStatus === 'response'"
+              class="tag is-medium is-danger"
+              >Rückfrage</span
+            >
+            <span
               v-else-if="ticket.ticketStatus === 'closed'"
               class="tag is-medium is-success"
               >Abgeschlossen</span
