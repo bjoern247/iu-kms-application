@@ -208,14 +208,14 @@ router.beforeEach((to, from, next) => {
         if (userData.role === 'editor' || userData.role === 'admin') {
           next();
         } else {
-          next('/') // maybe change with forbidden page
+          next('/') // maybe change to forbidden page
         }
       }
       else if (adminOnly) {
         if (userData.role === 'admin') {
           next();
         } else {
-          next('/') // maybe change with forbidden page
+          next('/') // maybe change to forbidden page
         }
       } else {
         next();

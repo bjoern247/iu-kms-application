@@ -69,17 +69,8 @@ export default function () {
       .auth()
       .signOut()
       .then(() => {
-        // clear data store
-        state.user = null;
-        state.initialized = false;
-        state.error = null;
-        state.userData.appLoaded = false;
-        state.userData.displayName = null;
-        state.userData.role = null;
-        state.userData.uid = null;
-        state.userData.email = null;
-        state.userData.deactivated = false;
         router.push("/login");
+        // detach all realtime-listeners forom firestore
         unsubscribeAllListeners();
       })
       .catch((error) => {
@@ -96,13 +87,14 @@ export default function () {
               .doc(_user.uid)
               .onSnapshot((doc) => {
                 const _data = doc.data();
-                console.log(_data);
+                // Filling state object
                 state.userData.displayName = _data.displayName;
                 state.userData.email = _data.email;
                 state.userData.role = _data.role;
                 state.userData.uid = _data.uid;
                 state.userData.deactivated = _data.deactivated;
-                console.log("AuthCheck");
+                /* Start role based listeners, if completed successfully 
+                set appLoaded variable to true, for loading spinner */
                 startAllListeners().then(() => {
                   console.log(courses);
                   state.userData.appLoaded = true;
@@ -110,7 +102,16 @@ export default function () {
                 })
               });
           } else {
+            // clear data store, because no user logged in
             state.user = null;
+            state.initialized = false;
+            state.error = null;
+            state.userData.appLoaded = false;
+            state.userData.displayName = null;
+            state.userData.role = null;
+            state.userData.uid = null;
+            state.userData.email = null;
+            state.userData.deactivated = false;
             resolve(false);
           }
           state.initialized = true;
@@ -689,8 +690,7 @@ export const createTicket = async (name, text, category, courseId) => {
   const docId = await getCourseDocById(courseId);
   console.log(docId);
   return new Promise((resolve, reject) => {
-    let newTicketRef = ticketCollection.doc();
-    newTicketRef.set({
+    ticketCollection.doc().set({
       ticketName: name,
       ticketText: text,
       ticketCategory: category,
@@ -710,7 +710,6 @@ export const createTicket = async (name, text, category, courseId) => {
         minute: 'numeric',
       })]
     }).then(() => {
-      console.log("Ticket sucessfully created")
       resolve();
     }).catch((error) => {
       alert(error);
@@ -724,7 +723,9 @@ export const validateTicket = (id) => {
   return new Promise((resolve, reject) => {
     ticketCollection.doc(id).update({
       ticketStatus: 'validated',
-      ticketLog: firebase.firestore.FieldValue.arrayUnion('An Bearbeiter zugewiesen: ' + new Date().toLocaleDateString('de-DE', {
+      ticketLog: firebase.firestore
+        .FieldValue
+        .arrayUnion('An Bearbeiter zugewiesen: ' + new Date().toLocaleDateString('de-DE', {
         day: 'numeric',
         year: 'numeric',
         month: '2-digit',
@@ -1016,7 +1017,7 @@ export const unassignEditor = async (uid, course, courseId) => {
 LISTENER MANAGEMENT
 */
 
-// Role based loading
+// Role based realtime listener attachment
 export const startAllListeners = async () => {
   if (state.userData.role === 'admin') {
     await loadUsers();
@@ -1037,6 +1038,17 @@ export const startAllListeners = async () => {
     getStudentAmountCreated(); // realtime created tickets number for student home view
     getStudentAmountValidated(); // realtime validated tickets number for student home view
   }
+}
+
+// Detach all realtime listeners, for example when logging user out
+export const unsubscribeAllListeners = () => {
+  stopTicketListeners();
+  stopCourseListeners();
+  stopUserListeners();
+  // called by auth.js on user signout to unsubscribe all firestore realtime listeners
+  subscribers.value.forEach(subscriber => subscriber());
+  subscribers.value = [];
+  console.log('Stopped all realtime listeners');
 }
 
 // Attaching listeners 
@@ -1079,14 +1091,5 @@ export const getbackButtonState = () => {
   return backButtonDisabled;
 }
 
-// Detach all realtime listeners, for example when logging user out
-export const unsubscribeAllListeners = () => {
-  stopTicketListeners();
-  stopCourseListeners();
-  stopUserListeners();
-  // called by auth.js on user signout to unsubscribe all firestore realtime listeners
-  subscribers.value.forEach(subscriber => subscriber());
-  subscribers.value = [];
-  console.log('Stopped all realtime listeners');
-}
+
 

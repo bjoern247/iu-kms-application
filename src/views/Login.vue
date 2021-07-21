@@ -65,7 +65,6 @@ export default {
         .auth()
         .signInWithEmailAndPassword(email.value, password.value)
         .then(() => {
-          // (data) => console.log(data);
           router.push("/");
           loading.value = false;
         })
