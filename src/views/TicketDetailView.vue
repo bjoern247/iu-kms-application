@@ -81,7 +81,7 @@
                       month: '2-digit',
                       hour: 'numeric',
                       minute: 'numeric',
-                    })
+                    }) + ' Uhr'
                   "
                   placeholder="Error-732"
                 />
@@ -98,7 +98,13 @@
                 ></textarea>
               </div>
             </div>
-            <div class="field" v-if="ticket.ticketResponseComment && ticket.ticketStatus === 'response'">
+            <div
+              class="field"
+              v-if="
+                ticket.ticketResponseComment &&
+                ticket.ticketStatus === 'response'
+              "
+            >
               <label class="label">Rückfrage-Kommentar</label>
               <div class="control">
                 <textarea
@@ -183,13 +189,15 @@
                   class="input"
                   type="text"
                   :value="
-                    ticket.ticketQuestionResponseDate.toDate().toLocaleDateString('de-DE', {
-                      day: 'numeric',
-                      year: 'numeric',
-                      month: '2-digit',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                    })
+                    ticket.ticketQuestionResponseDate
+                      .toDate()
+                      .toLocaleDateString('de-DE', {
+                        day: 'numeric',
+                        year: 'numeric',
+                        month: '2-digit',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                      }) + ' Uhr'
                   "
                   placeholder="Error-732"
                 />
@@ -268,7 +276,7 @@
                           month: '2-digit',
                           hour: 'numeric',
                           minute: 'numeric',
-                        })
+                        }) + ' Uhr'
                     "
                     placeholder="Datum"
                   />
@@ -278,7 +286,6 @@
           </div>
         </div>
       </div>
-      <hr />
       <!-- Ticketbearbeitung -->
       <div
         v-if="userData.role === 'editor' && ticket.ticketStatus === 'validated'"
@@ -449,10 +456,24 @@
       </div>
       <!-- Administratorbereich -->
       <div v-if="userData.role === 'admin'">
+        <hr />
         <p class="title mt-4">Adminbereich</p>
         <div class="columns">
           <div class="column is-8">
-            <div class="field">
+            <fieldset disabled>
+              <div class="field">
+                <label class="label">Bearbeiter</label>
+                <div class="control has-icons-right">
+                  <input
+                    class="input"
+                    type="text"
+                    v-model="ticket.ticketEditorMail"
+                    placeholder="E-Mail"
+                  />
+                </div>
+              </div>
+            </fieldset>
+            <div class="field mt-2">
               <label class="label">Ticket-Log</label>
               <div class="control">
                 <fieldset disabled>
@@ -464,7 +485,22 @@
                 </fieldset>
               </div>
             </div>
-            <div class="field" v-if="userData.role === 'admin'">
+          </div>
+          <div class="column is-4">
+            <fieldset disabled>
+              <div class="field">
+                <label class="label">Bearbeiter-ID</label>
+                <div class="control has-icons-right">
+                  <input
+                    class="input"
+                    type="text"
+                    v-model="ticket.ticketEditor"
+                    placeholder="User-ID"
+                  />
+                </div>
+              </div>
+            </fieldset>
+            <div class="field mt-2" v-if="userData.role === 'admin'">
               <label class="label">Administrator-Operationen</label>
               <div class="control buttons mt-2">
                 <button
@@ -492,32 +528,6 @@
                 </button>
               </div>
             </div>
-          </div>
-          <div class="column is-4">
-            <fieldset disabled>
-              <div class="field">
-                <label class="label">Bearbeiter</label>
-                <div class="control has-icons-right">
-                  <input
-                    class="input"
-                    type="text"
-                    v-model="ticket.ticketEditorMail"
-                    placeholder="E-Mail"
-                  />
-                </div>
-              </div>
-              <div class="field">
-                <label class="label">Bearbeiter-ID</label>
-                <div class="control has-icons-right">
-                  <input
-                    class="input"
-                    type="text"
-                    v-model="ticket.ticketEditor"
-                    placeholder="User-ID"
-                  />
-                </div>
-              </div>
-            </fieldset>
           </div>
         </div>
       </div>
@@ -739,7 +749,7 @@ export default {
       submitCloseTicket,
       submitDeleteStudent,
       submitQuestion,
-      submitResponse
+      submitResponse,
     };
   },
 };
