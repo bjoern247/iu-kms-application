@@ -20,9 +20,7 @@ const routes = [
   {
     path: '/ticket-overview',
     name: 'TicketOverview',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/TicketOverview.vue'),
     meta: {
       requiresAuth: true,
@@ -33,9 +31,7 @@ const routes = [
   {
     path: '/create-course',
     name: 'CourseCreation',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseCreation.vue'),
     meta: {
       requiresAuth: true,
@@ -46,9 +42,7 @@ const routes = [
   {
     path: '/user-overview',
     name: 'UserOverview',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/UserOverview.vue'),
     meta: {
       requiresAuth: true,
@@ -59,9 +53,7 @@ const routes = [
   {
     path: '/course-overview',
     name: 'CourseOverview',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseOverview.vue'),
     meta: {
       requiresAuth: true,
@@ -72,9 +64,7 @@ const routes = [
   {
     path: '/my-courses',
     name: 'MyCourses',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/editor/MyCourses.vue'),
     meta: {
       requiresAuth: true,
@@ -85,9 +75,7 @@ const routes = [
   {
     path: '/assigned-tickets',
     name: 'MyTickets',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/editor/MyTickets.vue'),
     meta: {
       requiresAuth: true,
@@ -98,9 +86,7 @@ const routes = [
   {
     path: '/course-editors/:id',
     name: 'CourseEditors',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseEditors.vue'),
     meta: {
       requiresAuth: true,
@@ -111,9 +97,7 @@ const routes = [
   {
     path: '/ticket-detail-view/:id',
     name: 'TicketDetailView',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/TicketDetailView.vue'),
     meta: {
       requiresAuth: true,
@@ -124,9 +108,7 @@ const routes = [
   {
     path: '/course-detail-view/:id',
     name: 'CourseDetailView',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/editor/CourseDetailView.vue'),
     meta: {
       requiresAuth: true,
@@ -137,9 +119,7 @@ const routes = [
   {
     path: '/course-edit/:id',
     name: 'CourseAdministration',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/CourseAdministration.vue'),
     meta: {
       requiresAuth: true,
@@ -150,9 +130,7 @@ const routes = [
   {
     path: '/user-detail-view/:id',
     name: 'UserAdministration',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/admin/UserAdministration.vue'),
     meta: {
       requiresAuth: true,
@@ -163,9 +141,7 @@ const routes = [
   {
     path: '/create-ticket',
     name: 'TicketCreation',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/student/TicketCreation.vue'),
     meta: {
       requiresAuth: true,
@@ -176,9 +152,7 @@ const routes = [
   {
     path: '/settings',
     name: 'Settings',
-    // route level code-splitting
-    // this generates a separate chunk (tickets.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // Lazy Loading
     component: () => import(/* webpackChunkName: "tickets" */ '../views/Settings.vue'),
     meta: {
       requiresAuth: true,
@@ -204,26 +178,33 @@ router.beforeEach((to, from, next) => {
   const adminOnly = to.matched.some(record => record.meta.adminOnly);
   if (requiresAuth) {
     if (state.user.value !== null) {
+      // User is logged in, next step, check if certain role permission is needed to access page (e.g. admin or editor role needed)
       if (editorOnly) {
         if (userData.role === 'editor' || userData.role === 'admin') {
+          // User is logged in, atleast editor role required, user is editor or admin -> display page
           next();
         } else {
+          // User is logged in, atleast editor role required, but user isn't an admin or editor -> redirect to home page
           next('/') // maybe change to forbidden page
         }
       }
       else if (adminOnly) {
         if (userData.role === 'admin') {
+          // User is logged in, admin role required, user is admin -> display page
           next();
         } else {
+          // User is logged in, admin role required, but user isn't an admin -> redirect to home page
           next('/') // maybe change to forbidden page
         }
       } else {
+        // User is logged in, no additional permissions needed -> display page
         next();
       }
     } else {
       next('/login');
     }
   } else {
+    // Display page if authentication is not required
     next();
   }
   
