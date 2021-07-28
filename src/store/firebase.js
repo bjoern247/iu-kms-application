@@ -5,12 +5,12 @@ import firebase from "firebase";
 import "firebase/firestore";
 
 const config = {
-  apiKey: "AIzaSyAWDLDDTxbo1HV0sZwTE1Daml5teFGIhIA",
-  authDomain: "vue-firebase-test-2e9c0.firebaseapp.com",
-  projectId: "vue-firebase-test-2e9c0",
-  storageBucket: "vue-firebase-test-2e9c0.appspot.com",
-  messagingSenderId: "1057748161302",
-  appId: "1:1057748161302:web:054576a0632912e67cb637"
+  apiKey: "AIzaSyBv94s-iXRqT-_pmxQJFZQJe5YkAdZKM6I",
+  authDomain: "iu-kms-isef-project.firebaseapp.com",
+  projectId: "iu-kms-isef-project",
+  storageBucket: "iu-kms-isef-project.appspot.com",
+  messagingSenderId: "830529436713",
+  appId: "1:830529436713:web:f51626aee23e57fd7e3038"
 };
 firebase.initializeApp(config);
 
